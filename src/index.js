@@ -1,8 +1,8 @@
-import Model, * as model from './src/model';
-import ModelList from './src/modellist';
-import Factory from './src/factory';
-import Registry, * as registry from './src/registry';
-import ModelRegistry from './src/modelregistry';
+import Model, * as model from './model';
+import ModelList from './modellist';
+import Factory from './factory';
+import Registry, * as registry from './registry';
+import ModelRegistry from './modelregistry';
 /**
  * Mozy classes
  */
