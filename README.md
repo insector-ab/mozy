@@ -20,10 +20,10 @@ npm run coverage
 Current coverage:
 ```
 =============================== Coverage summary ===============================
-Statements   : 31.06% ( 82/264 )
-Branches     : 17.53% ( 27/154 )
-Functions    : 50% ( 6/12 )
-Lines        : 32.14% ( 81/252 )
+Statements   : 25.53% ( 85/333 )
+Branches     : 15.7% ( 27/172 )
+Functions    : 35.29% ( 6/17 )
+Lines        : 26.33% ( 84/319 )
 ================================================================================
 ```
 
@@ -63,7 +63,7 @@ export class Rect extends mozy.Model {
     }
 
     _getDefaults() {
-        let d = super._getDefaults();
+        const d = super._getDefaults();
         d.identity = Rect.identity;
         d.x = 0.0;
         d.y = 0.0;
@@ -103,7 +103,7 @@ export class Dimensions extends mozy.Model {
     }
 
     _getDefaults() {
-        let d = super._getDefaults();
+        const d = super._getDefaults();
         d.identity = Dimensions.identity;
         d.contentBox = (new Rect).data;
         d.padding = (new EdgeSizes).data;
@@ -127,7 +127,7 @@ mozy.identities.set(Dimensions.identity, Dimensions);
 ## Using models
 
 ```javascript
-let dim = new Dimensions();
+const dim = new Dimensions();
 dim.contentBox.width = 100;
 dim.contentBox.height = 40;
 dim.padding.left = 10;
@@ -135,7 +135,7 @@ dim.padding.right = 10;
 dim.borderWidth.top = 1;
 dim.borderWidth.bottom = 1;
 
-let jsonStr = JSON.stringify(dim.data);
+const jsonStr = JSON.stringify(dim.data);
 console.log(jsonStr);
 ```
 
@@ -183,8 +183,8 @@ Will log:
 Restoring the model from data dict:
 
 ```javascript
-let data = JSON.parse(jsonStr);
-let dim = new Dimensions(data);
+const data = JSON.parse(jsonStr);
+const dim = new Dimensions(data);
 console.log(dim.padding.right) // 10
 ```
 
@@ -193,8 +193,8 @@ Or, if root constructor is unknown, using the registry:
 ```javascript
 import mozy from 'mozy';
 
-let data = JSON.parse(jsonStr);
-let model = mozy.registry.getModel(data);
+const data = JSON.parse(jsonStr);
+const model = mozy.registry.getModel(data);
 console.log(model.padding.right) // 10
 ```
 
