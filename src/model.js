@@ -7,16 +7,20 @@ import isUndefined from 'lodash.isundefined';
 import uuidV4 from 'uuid/v4';
 
 /**
+ * Model identities
+ */
+export const identities = new Map();
+/**
  * Flags for controlling mutation.
  * Flag index n must have value 2^n.
  * @example
  * this.set('active', value, UNSET_IF_FALSE);
  * this.set('active', value, UNSET_IF_FALSE + SET_SILENT);
  */
-export const SET_SILENT = 1; // Don't dispatch event when setting
+export const SET_SILENT = 1; // Don't dispatch event when setting.
 export const UNSET_IF_FALSE = 2; // If value evaluates to Boolean False, unset property.
 export const SOFT_UPDATE = 4; // During update, if no setter or model found, use set() silent.
-export const RESET_REFERENCE = 8; // Reset this._data or this._items references in reset()
+export const RESET_REFERENCE = 8; // Reset this._data or this._items references in reset().
 /**
  * Helper for checking flags, e.g. for Model.set().
  * @param {Integer} dec Sum of flags.
@@ -382,3 +386,5 @@ export default class Model extends EventEmitter {
 }
 // Polymorphic identity
 Model.identity = 'mozy.Model';
+// Register Model
+identities.set(Model.identity, Model);

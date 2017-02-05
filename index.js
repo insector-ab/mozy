@@ -1,7 +1,7 @@
-import Model from './src/model';
+import Model, * as model from './src/model';
 import ModelList from './src/modellist';
 import Factory from './src/factory';
-import Registry from './src/registry';
+import Registry, * as registry from './src/registry';
 import ModelRegistry from './src/modelregistry';
 /**
  * Mozy classes
@@ -12,18 +12,13 @@ export { Factory };
 export { Registry };
 export { ModelRegistry };
 /**
- * Model identities
- */
-export const identities = new Map();
-identities.set(Model.identity, Model);
-/**
  * Model factory
  */
-export const factory = new Factory(identities);
+export const modelFactory = new Factory(model.identities);
 /**
  * Model registry
  */
-export const registry = new ModelRegistry('uuid', factory);
+export const modelRegistry = new ModelRegistry('uuid', modelFactory);
 /**
  * Mozy export
  */
@@ -33,7 +28,9 @@ export default {
     Factory,
     Registry,
     ModelRegistry,
-    identities,
-    factory,
-    registry
+    model,
+    registry,
+    modelIdentities: model.identities,
+    modelFactory,
+    modelRegistry
 };
