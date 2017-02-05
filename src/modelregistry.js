@@ -111,7 +111,11 @@ export default class ModelRegistry extends Registry {
         // No model found, create new model and register
         if (!model) {
             // New model
-            model = this.newInstanceFor(data, Constructor);
+            if (Constructor) {
+                model = new Constructor(data);
+            } else {
+                model = this.newInstanceFor(data);
+            }
             // Get key in data
             key = this.getValidKeyIn(data);
             // Register
@@ -121,26 +125,19 @@ export default class ModelRegistry extends Registry {
         return model;
     }
     /**
-     * Create new model instance using factory or Constructor.
+     * Create new model instance using factory.
      * @param {Object} data JSON serializable object.
-     * @param {Function} Constructor Make new model of type Constructor.
      * @return {Model} New Model instance.
      */
-    newInstanceFor(data, Constructor, constructorArgs) {
-        // Constructor specified
-        if (Constructor) {
-            constructorArgs = constructorArgs || [data];
-            return new Constructor(...constructorArgs);
+    newInstanceFor(data) {
+        // If mozy.Factory
+        if (this.factory instanceof Factory) {
+            return this.factory.newInstanceFor(data);
         }
-        if (this.factory) {
-            // If mozy.Factory
-            if (this.factory instanceof Factory) {
-                return this.factory.newInstanceFor(data, constructorArgs);
-            // Assume function
-            } else {
-                const factoryFunction = this.factory;
-                return factoryFunction.apply(this, constructorArgs || [data]);
-            }
+        // If Function
+        if (isFunction(this.factory)) {
+            const factoryFunction = this.factory;
+            return factoryFunction.call(this, data);
         }
         // No factory and no Constructor argument.
         throw new Error('Could not create model from data. Missing factory/constructor.');

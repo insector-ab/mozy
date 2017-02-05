@@ -20,19 +20,19 @@ npm run coverage
 Current coverage:
 ```
 =============================== Coverage summary ===============================
-Statements   : 30.6% ( 82/268 )
-Branches     : 16.88% ( 27/160 )
+Statements   : 31.06% ( 82/264 )
+Branches     : 17.53% ( 27/154 )
 Functions    : 50% ( 6/12 )
-Lines        : 31.76% ( 81/255 )
+Lines        : 32.14% ( 81/252 )
 ================================================================================
 ```
 
 ## Defining models
 
 ```javascript
-import {Model, modelIdentities, modelRegistry} from 'mozy';
+import mozy from 'mozy';
 
-export class Rect extends Model {
+export class Rect extends mozy.Model {
 
     get x() {
         return this.get('x');
@@ -80,7 +80,7 @@ Rect.identity = 'shape.Rect';
  * Skipping EdgeSizes definition
  */
 
-export class Dimensions extends Model {
+export class Dimensions extends mozy.Model {
 
     get contentBox() {
         return this._getModel('contentBox');
@@ -99,7 +99,7 @@ export class Dimensions extends Model {
     }
 
     _getModel(property) {
-        return modelRegistry.getModel(this.get(property));
+        return mozy.registry.getModel(this.get(property));
     }
 
     _getDefaults() {
@@ -119,9 +119,9 @@ Dimensions.identity = 'layout.Dimensions';
 /**
  * Register identities
  */
-modelIdentities.set(Rect.identity,       Rect);
-modelIdentities.set(EdgeSizes.identity,  EdgeSizes);
-modelIdentities.set(Dimensions.identity, Dimensions);
+mozy.identities.set(Rect.identity,       Rect);
+mozy.identities.set(EdgeSizes.identity,  EdgeSizes);
+mozy.identities.set(Dimensions.identity, Dimensions);
 ```
 
 ## Using models
@@ -191,10 +191,10 @@ console.log(dim.padding.right) // 10
 Or, if root constructor is unknown, using the registry:
 
 ```javascript
-import {modelRegistry} from 'mozy';
+import mozy from 'mozy';
 
 let data = JSON.parse(jsonStr);
-let model = modelRegistry.getInstance(data);
+let model = mozy.registry.getModel(data);
 console.log(model.padding.right) // 10
 ```
 

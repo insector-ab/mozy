@@ -50,7 +50,7 @@ export default class Factory {
             throw new TypeError('Argument obj must be Object');
         }
         // Return identity
-        return this._identityGetter.call(this, obj);
+        return this._identityGetter(obj);
     }
     /**
      * Same as getIdentityOf, but throws error if undefined.
@@ -113,13 +113,13 @@ export default class Factory {
     /**
      * Get new instance of Constructor registered for identity in object.
      * @param {Object} obj Object with polymorphic identity.
-     * @param {...args} constructorArgs Arguments passed to Constructor.
-     * @return {Object} Instance of Constructor.
+     * @return {Object} Instance of Constructor for identity.
      */
-    newInstanceFor(obj, ...constructorArgs) {
+    newInstanceFor(obj) {
+        // Require identity in obj
         const identity = this.requireIdentityOf(obj);
-        constructorArgs = constructorArgs || [obj];
-        return this.newInstance(identity, ...constructorArgs);
+        // Return new instance of Constructor for identity
+        return this.newInstance(identity, obj);
     }
 
 }
