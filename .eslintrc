@@ -1,0 +1,16 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "mocha"
+    ],
+    "extends": "standard",
+    "rules": {
+        "indent": [2, 4, {"SwitchCase": 1}],
+        "semi": [2, "always"],
+        "space-before-function-paren": [2, "never"],
+        "mocha/no-exclusive-tests": "error"
+    }
+}

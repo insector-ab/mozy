@@ -1,0 +1,61 @@
+{
+  "name": "mozy",
+  "version": "0.1.0",
+  "description": "A model library using lazy initialization, factories and instance registries.",
+  "main": "index.js",
+  "dependencies": {
+    "es6-error": "^4.0.0",
+    "events": "^1.1.0",
+    "lodash.isfunction": "^3.0.8",
+    "lodash.isobject": "^3.0.2",
+    "lodash.isundefined": "^3.0.1",
+    "lodash.keys": "^4.2.0",
+    "lodash.uniqueid": "^4.0.1",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.20.0",
+    "babel-preset-es2015": "^6.18.0",
+    "chai": "^3.5.0",
+    "eslint": "^3.12.0",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-mocha": "^4.8.0",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "istanbul": "^1.1.0-alpha.1",
+    "lodash.uniq": "^4.5.0",
+    "mocha": "^3.2.0",
+    "uuid-validate": "0.0.2"
+  },
+  "scripts": {
+    "test": "mocha --compilers js:babel-core/register ./test/**/*.test.js",
+    "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register ./test/**/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/insector-ab/mozy.git"
+  },
+  "keywords": [
+    "model",
+    "lazy",
+    "factory",
+    "registry",
+    "mozy"
+  ],
+  "author": "Martin Söderholm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/insector-ab/mozy/issues"
+  },
+  "homepage": "https://github.com/insector-ab/mozy#readme",
+  "contributors": [
+    {
+      "name": "Martin Söderholm",
+      "email": "matte@insector.se"
+    },
+    {
+      "name": "Joel Källgren",
+      "email": "joel@insector.se"
+    }
+  ]
+}
