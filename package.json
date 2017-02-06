@@ -2,7 +2,7 @@
   "name": "mozy",
   "version": "0.1.0",
   "description": "A model library using lazy initialization, factories and instance registries.",
-  "main": "lib/index.js",
+  "main": "index.js",
   "dependencies": {
     "es6-error": "^4.0.0",
     "events": "^1.1.0",
@@ -31,7 +31,8 @@
   "scripts": {
     "test": "mocha --compilers js:babel-core/register ./test/**/*.test.js",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register ./test/**/*.test.js",
-    "build": "babel src --out-dir lib"
+    "build": "babel src --out-dir .",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",

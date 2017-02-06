@@ -191,8 +191,6 @@ console.log(dim.padding.right) // 10
 Or, if root constructor is unknown, using the registry:
 
 ```javascript
-import mozy from 'mozy';
-
 const data = JSON.parse(jsonStr);
 const model = mozy.registry.getModel(data);
 console.log(model.padding.right) // 10
