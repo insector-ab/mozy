@@ -70,7 +70,7 @@ export class Rect extends mozy.Model {
 // Polymorphic identity
 Rect.identity = 'layout.Rect';
 // Register model
-mozy.identities.set(Rect.identity, Rect);
+mozy.modelIdentities.set(Rect.identity, Rect);
 
 /**
  * EdgeSizes
@@ -129,7 +129,7 @@ export class EdgeSizes extends mozy.Model {
 // Polymorphic identity
 EdgeSizes.identity = 'layout.EdgeSizes';
 // Register model
-mozy.identities.set(EdgeSizes.identity, EdgeSizes);
+mozy.modelIdentities.set(EdgeSizes.identity, EdgeSizes);
 
 /**
  * Dimensions
@@ -170,4 +170,4 @@ export class Dimensions extends mozy.Model {
 // Polymorphic identity
 Dimensions.identity = 'layout.Dimensions';
 // Register model
-mozy.identities.set(Dimensions.identity, Dimensions);
+mozy.modelIdentities.set(Dimensions.identity, Dimensions);

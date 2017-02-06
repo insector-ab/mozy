@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import chai from 'chai';
-import {Model, Factory, identities} from '../index';
+import {Model, Factory, modelIdentities} from '../index';
 import {Rect, EdgeSizes, Dimensions} from './layout';
 
 chai.should();
@@ -91,7 +91,7 @@ describe('Factory', () => {
         });
         // Method: getIdentityOf
         describe('.getIdentityOf(obj)', () => {
-            const factory = new Factory(identities);
+            const factory = new Factory(modelIdentities);
             const model = new Model();
             // Check return type
             it('should require an object as argument', function() {
