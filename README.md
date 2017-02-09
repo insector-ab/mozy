@@ -20,10 +20,10 @@ npm run coverage
 Current coverage:
 ```
 =============================== Coverage summary ===============================
-Statements   : 42.51% ( 247/581 )
-Branches     : 30.38% ( 103/339 )
-Functions    : 41.67% ( 55/132 )
-Lines        : 37.23% ( 175/470 )
+Statements   : 42.16% ( 258/612 )
+Branches     : 28.61% ( 105/367 )
+Functions    : 37.67% ( 55/146 )
+Lines        : 38.51% ( 186/483 )
 ================================================================================
 ```
 
@@ -88,10 +88,10 @@ export class Dimensions extends mozy.Model {
     _getDefaults() {
         const d = super._getDefaults();
         d.identity = Dimensions.identity;
-        d.contentBox = (new Rect()).getModelData();
-        d.padding = (new EdgeSizes()).getModelData();
-        d.borderWidth = (new EdgeSizes()).getModelData();
-        d.margin = (new EdgeSizes()).getModelData();
+        d.contentBox = {identity: Rect.identity};
+        d.padding = {identity: EdgeSizes.identity};
+        d.borderWidth = {identity: EdgeSizes.identity};
+        d.margin = {identity: EdgeSizes.identity};
         return d;
     }
 
