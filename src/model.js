@@ -265,7 +265,7 @@ export default class Model extends EventEmitter {
             return;
         }
         // Soft update
-        if (this.softUpdate || flagIsSet(flags, SOFT_UPDATE)) {
+        if (flagIsSet(flags, SOFT_UPDATE)) {
             this.set(property, value, SET_SILENT);
             return;
         }
@@ -303,9 +303,7 @@ export default class Model extends EventEmitter {
      * @param {...} args Arguments passed to listeners.
      */
     dispatchEvent(eventType, ...args) {
-        if (this._notify) {
-            this.emit(eventType, ...args);
-        }
+        this.emit(eventType, ...args);
     }
     /**
      * Dispatch change events.
@@ -315,10 +313,9 @@ export default class Model extends EventEmitter {
      */
     dispatchChange(property, newValue, oldValue) {
         if (property) {
-            this.dispatchEvent('change.' + property, newValue, oldValue);
-        } else {
-            this.dispatchEvent('change', this);
+            this.dispatchEvent('change ' + property, newValue, oldValue);
         }
+        this.dispatchEvent('change', this);
     }
     /**
      * Alias for EventEmitter.addListener

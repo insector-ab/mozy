@@ -41,26 +41,9 @@ export class Rect extends mozy.Model {
         this.set('x', value);
     }
 
-    get y() {
-        return this.get('y');
-    }
-    set y(value) {
-        this.set('y', value);
-    }
-
-    get width() {
-        return this.get('width');
-    }
-    set width(value) {
-        this.set('width', value);
-    }
-
-    get height() {
-        return this.get('height');
-    }
-    set height(value) {
-        this.set('height', value);
-    }
+    /**
+     * Skipping y, width, height ...
+     */
 
     _getDefaults() {
         const d = super._getDefaults();
@@ -105,10 +88,10 @@ export class Dimensions extends mozy.Model {
     _getDefaults() {
         const d = super._getDefaults();
         d.identity = Dimensions.identity;
-        d.contentBox = (new Rect).data;
-        d.padding = (new EdgeSizes).data;
-        d.borderWidth = (new EdgeSizes).data;
-        d.margin = (new EdgeSizes).data;
+        d.contentBox = (new Rect()).getModelData();
+        d.padding = (new EdgeSizes()).getModelData();
+        d.borderWidth = (new EdgeSizes()).getModelData();
+        d.margin = (new EdgeSizes()).getModelData();
         return d;
     }
 
@@ -135,7 +118,7 @@ dim.padding.right = 10;
 dim.borderWidth.top = 1;
 dim.borderWidth.bottom = 1;
 
-const jsonStr = JSON.stringify(dim.data);
+const jsonStr = JSON.stringify(dim.getModelData());
 console.log(jsonStr);
 ```
 

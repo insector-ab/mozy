@@ -1,6 +1,8 @@
 import isObject from 'lodash.isobject';
 import isFunction from 'lodash.isfunction';
 import Registry, {InvalidRegistryKeyError} from './registry';
+import Model from './model';
+import ModelList, {getModelListHandler, getRelationListHandler} from './modellist';
 import Factory from './factory';
 
 /**
@@ -25,6 +27,9 @@ export default class ModelRegistry extends Registry {
      * @param {Function} keyValidator @see Registry constructor.
      */
     constructor(keyAttr, factory, map, allowOverrides, keyValidator) {
+        if (!factory) {
+            throw new TypeError('Argument factory required.');
+        }
         // Super
         super(map, allowOverrides, keyValidator || defaultKeyValidator);
         // key to register
@@ -53,6 +58,20 @@ export default class ModelRegistry extends Registry {
     }
     set factory(value) {
         this._factory = value;
+    }
+    /**
+     * Validate key and value. If not valid throw error.
+     * @param {*} key The key to Validate.
+     * @param {*} value Tha value to validate.
+     * @return {ModelRegistry} The ModelRegistry object.
+     */
+    validate(key, value) {
+        super.validate(key, value);
+        // value must be instance of Model or ModelList
+        if (!(value instanceof Model || value instanceof ModelList)) {
+            throw new TypeError('Registry value must be instance of Model or ModelList.');
+        }
+        return this;
     }
     /**
      * Get valid key from data object. Throw error if not valid.
@@ -102,8 +121,11 @@ export default class ModelRegistry extends Registry {
      * @return {Model} New or registered model.
      */
     getModel(data, Constructor) {
-        // Get registered key and model
-        let [key, model] = this.getEntryForData(data);
+        let key, model;
+        // If data has valid key, get key and model (if registered)
+        if (this.dataHasValidKey(data)) {
+            [key, model] = this.getEntryForData(data);
+        }
         // Don't allow getting registered models with different data object
         if (model && model.getModelData() !== data) {
             throw new Error('Data object mismatch.');
@@ -117,12 +139,48 @@ export default class ModelRegistry extends Registry {
                 model = this.newInstanceFor(data);
             }
             // Get key in data
-            key = this.getValidKeyIn(data);
+            key = this.getValidKeyIn(model.getModelData());
             // Register
             this.set(key, model);
         }
         // Return existing or new model
         return model;
+    }
+    /**
+     * Get existing ModelList in registry or create new.
+     * @return {ModelList} New or registered ModelList.
+     */
+    getModelList(items, key, handler) {
+        let modelList;
+        // Require valid key
+        if (!this.isValidKey(key)) {
+            throw new InvalidRegistryKeyError(key, items);
+        }
+        // If registered
+        if (this.has(key)) {
+            modelList = this.get(key);
+        }
+        // Don't allow getting registered modelList with different items array
+        if (modelList && modelList.items !== items) {
+            throw new Error('Items array mismatch.');
+        }
+        // No modelList found, create new modelList and register
+        if (!modelList) {
+            // New
+            modelList = new ModelList(items, handler || getModelListHandler(this));
+            // Register
+            this.set(key, modelList);
+        }
+        // Return existing or new modelList
+        return modelList;
+    }
+    /**
+     * Same as getModelList but with default relation list handler.
+     * @return {ModelList} New or registered ModelList.
+     */
+    getRelationList(items, key, keyAttr) {
+        const handler = getRelationListHandler(this, keyAttr || this.keyAttr);
+        return this.getModelList(items, key, handler);
     }
     /**
      * Create new model instance using factory.

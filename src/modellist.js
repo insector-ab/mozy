@@ -1,35 +1,53 @@
-import uniqueId from 'lodash.uniqueid';
+import uuidV4 from 'uuid/v4';
 import {RESET_REFERENCE, flagIsSet} from './model';
 
 /**
- * Default getItemFunction for ModelList.
- * @param  {Model} model The Model to get the item from.
- * @return {*} Anything JSON serializable.
+ * Get default ModelList handler object.
+ * @param {ModelRegistry} modelRegistry The ModelRegistry from which to get the models.
+ * @return {Object} The Object with the handler methods.
  */
-function defaultGetItemFunction(model) {
-    return model.getModelData();
+export function getModelListHandler(modelRegistry) {
+    return {
+        getModel: function(item) {
+            return modelRegistry.getModel(item);
+        },
+        getItem: function(model) {
+            return model.getModelData();
+        }
+    };
+}
+/**
+ * Get ModelList handler object that stores uuid in target list,
+ * and gets models via uuid. Assumes models already exist in registry.
+ * @param {ModelRegistry} modelRegistry The ModelRegistry from which to get the models.
+ * @param {String} keyAttr The attribute from which to get the registry key for models.
+ * @return {Object} The Object with the handler methods.
+ */
+export function getRelationListHandler(modelRegistry, keyAttr = 'uuid') {
+    return {
+        getModel: function(key) {
+            return modelRegistry.get(key); // key => value for keyAttr (eg uuid, id, cid).
+        },
+        getItem: function(model) {
+            return model[keyAttr];
+        }
+    };
 }
 
 /**
  * ModelList
  */
-export class ModelList {
+export default class ModelList {
 
-    constructor(items, getModelFunction, getItemFunction) {
+    constructor(items, handler) {
         // Raw items in list
         this._items = items;
-        // Function for getting Model instances
-        this._getModelFunction = getModelFunction;
-        // Function for getting items from Models
-        this._getItemFunction = getItemFunction || defaultGetItemFunction;
+        // Handler object for getting models and storing items.
+        this._handler = handler;
         // Modifed timestamp
         this._modified = null;
-        // Unique client id
-        this._cid = uniqueId('modellist');
-    }
-
-    get cid() {
-        return this._cid;
+        // Uuid
+        this.uuid = uuidV4();
     }
 
     get length() {
@@ -45,28 +63,19 @@ export class ModelList {
 
     get models() {
         return this._items.map(item => {
-            return this._getModel(item);
+            return this._handler.getModel(item);
         });
     }
     set models(value) {
         this.items = value.map(model => {
-            return this._getItem(model);
+            return this._handler.getItem(model);
         });
     }
-    /**
-     * Moment when modified.
-     * @return {moment}
-     */
+
     get modified() {
         return this._modified;
     }
 
-    get lastChild() {
-        if (this.length === 0) {
-            return null;
-        }
-        return this.at(this.length - 1);
-    }
     /**
      * Interface for Model.updateProperty.
      * @param {Array} items List of anything JSON serializable.
@@ -76,7 +85,10 @@ export class ModelList {
     }
 
     at(index) {
-        return this._getModel(this.items[index]);
+        if (this.items[index]) {
+            return this._handler.getModel(this.items[index]);
+        }
+        return null;
     }
 
     add(model) {
@@ -85,33 +97,23 @@ export class ModelList {
 
     addAt(model, index) {
         // Add model at index
-        this._items.splice(index, 0, this._getItem(model));
-        // Modified
-        this.updateModified();
-        // return
-        return model;
+        this._items.splice(index, 0, this._handler.getItem(model));
+        // Update modified and return this.
+        return this.updateModified();
     }
 
     remove(model) {
         // index
         const index = this.indexOf(model);
-        // if not found, return null to indicate nothing was removed
-        if (index === -1) {
-            return null;
-        }
-        // Remove obj at index
-        this._items.splice(index, 1);
-        // Set modified
-        this.updateModified();
-        // return model to indicate it was removed
-        return model;
+        // Remove, update modified and return this.
+        return this.removeAt(index).updateModified();
     }
 
     removeAt(index) {
-        // get item
-        const model = this.at(index);
+        // Remove obj at index
+        this._items.splice(index, 1);
         // use remove method
-        return this.remove(model);
+        return this;
     }
     /**
      * Return index of model in list.
@@ -119,25 +121,27 @@ export class ModelList {
      * @return {Integer} Index of model.
      */
     indexOf(model) {
-        const item = this._getItem(model);
+        const item = this._handler.getItem(model);
         return this._items.indexOf(item);
     }
 
     reset(items, flags = 0) {
-        // remove current items
-        while (this._items.length) { this._items.pop(); };
         // If RESET_REFERENCE flag
         if (flagIsSet(flags, RESET_REFERENCE)) {
             // Set new reference
             this._items = items;
-        // else, keep reference and push items
+        // else, keep reference and replace items
         } else {
-            for (let item of items) {
-                this._items.push(this._getItem(this._getModel(item)));
-            }
+            this._items.splice(0, undefined, ...items);
         }
         // modified
-        this.updateModified();
+        return this.updateModified();
+    }
+
+    map(callback) {
+        return this._items.map((item, index) => {
+            return callback(this._handler.getModel(item), index);
+        });
     }
     /**
      * Update modified timestamp.
@@ -145,6 +149,7 @@ export class ModelList {
      */
     updateModified(modified) {
         this._modified = modified || Date.now();
+        return this;
     }
     /**
      * Dispose ModelList.
@@ -153,42 +158,20 @@ export class ModelList {
         this._deleteReferences();
     }
     /**
-     * Get Model from item in list.
-     * @param {*} item Anything JSON serializable.
-     * @return {Model} The Model instance.
-     */
-    _getModel(item) {
-        return this._getModelFunction(item);
-    }
-    /**
-     * Get item to store in list.
-     * @param {Model} model The Model to get the item from.
-     * @return {*} Anything JSON serializable.
-     */
-    _getItem(model) {
-        return this._getItemFunction(model);
-    }
-    /**
      * Delete references set on model.
      */
     _deleteReferences() {
         delete this._items;
+        delete this._handler;
         delete this._modified;
-        delete this._getModel;
-        delete this._getItem;
     }
 
     [Symbol.iterator]() {
         let i = 0;
         const iterator = {
             next: () => {
-                let item = this._items[i];
-                let done = i >= this._items.length;
-                let value;
-                if (!done) {
-                    value = this._getModel(item);
-                }
-                i++;
+                const done = i >= this._items.length;
+                const value = done ? undefined : this._handler.getModel(this._items[i++]);
                 return {value, done};
             }
         };

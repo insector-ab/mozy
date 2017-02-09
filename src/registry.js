@@ -1,7 +1,10 @@
 import ExtendableError from 'es6-error';
 import isUndefined from 'lodash.isundefined';
+import isFunction from 'lodash.isfunction';
 
-// Constants
+/**
+ * Constants
+ */
 export const ALLOW_OVERRIDES = true;
 export const DONT_ALLOW_OVERRIDES = false;
 
@@ -11,18 +14,22 @@ export const DONT_ALLOW_OVERRIDES = false;
 export default class Registry {
     /**
      * Registry.constructor
-     * @param {Map} map Map to use for registration.
+     * @param {Object|Map|Registry} map Map-like Object to use for registration.
      * @param {boolean} allowOverrides True if override of keys allowed.
      * @param {Function} keyValidator Function that takes key and returns true if valid.
      */
     constructor(map, allowOverrides, keyValidator) {
-        // Map to use for registration
+        // Map/Object to use for registration
         this._map = map || new Map();
+        // Proxy needed? If not Map or Registry assume Object.
+        if (!(this._map instanceof Map || this._map instanceof Registry)) {
+            this._map = getMapObjectProxy(this._map);
+        }
         // Allow overrides (default to false)
         this._allowOverrides = allowOverrides;
         this._defaultAllowOverrides = DONT_ALLOW_OVERRIDES;
         // Function for validating keys
-        this._keyValidator = keyValidator || function(key) { return true; };
+        this._keyValidator = keyValidator;
     }
     /**
      * Allow/disallow overriding of keys in registry.
@@ -52,13 +59,8 @@ export default class Registry {
      * @return {ModelRegistry} The ModelRegistry object.
      */
     set(key, value) {
-        if (!this.isValidKey(key)) {
-            throw new InvalidRegistryKeyError(key);
-        }
-        // Allow?
-        if (this.has(key) && this.allowOverrides === false) {
-            throw new Error(this.constructor.name + ' key "' + key + '" already registered.');
-        }
+        // Validate
+        this.validate(key, value);
         // register
         this._map.set(key, value);
         // Return
@@ -84,10 +86,7 @@ export default class Registry {
      * Map.clear API
      */
     clear() {
-        const mapIter = this._map.keys();
-        for (let key of mapIter) {
-            this.delete(key);
-        }
+        this._map.clear();
     }
     /**
      * Same as get(key), but throws error if key not found.
@@ -101,14 +100,34 @@ export default class Registry {
         return this.get(key);
     }
     /**
+     * Validate key and value. If not valid throw error.
+     * @param {*} key The key to Validate.
+     * @param {*} value Tha value to validate.
+     * @return {ModelRegistry} The ModelRegistry object.
+     */
+    validate(key, value) {
+        if (!this.isValidKey(key)) {
+            throw new InvalidRegistryKeyError(key);
+        }
+        // Allow?
+        if (this.has(key) && this.allowOverrides === false) {
+            throw new Error(this.constructor.name + ' key "' + key + '" already registered.');
+        }
+        // Return this
+        return this;
+    }
+    /**
      * Check if key is valid for registration.
      * @param {*} key The key of the element to return from the Registry.
      * @return {boolean} True if valid.
      */
     isValidKey(key) {
-        return this._keyValidator(key);
+        if (isFunction(this._keyValidator)) {
+            return this._keyValidator(key);
+        }
+        // No validation
+        return true;
     }
-
 }
 
 /**
@@ -124,4 +143,37 @@ export class InvalidRegistryKeyError extends ExtendableError {
         super(lines.join(' '));
     }
 
+}
+
+/**
+ * Get a Map proxy object for an Object instance.
+ * @param {Object} obj The Object to proxy.
+ * @return {Object} Object with basic Map API methods.
+ */
+function getMapObjectProxy(obj) {
+    return {
+        get: function(key) {
+            return obj[key];
+        },
+        set: function(key, value) {
+            obj[key] = value;
+        },
+        has: function(key) {
+            return obj.hasOwnProperty(key);
+        },
+        delete: function(key) {
+            if (obj.hasOwnProperty(key)) {
+                delete obj[key];
+                return true;
+            }
+            return false;
+        },
+        clear: function() {
+            for (let key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    delete obj[key];
+                }
+            }
+        }
+    };
 }
