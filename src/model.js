@@ -1,5 +1,4 @@
-import {EventEmitter} from 'events';
-import keys from 'lodash.keys';
+import EventEmitter from 'events';
 import uniqueId from 'lodash.uniqueid';
 import isObject from 'lodash.isobject';
 import isFunction from 'lodash.isfunction';
@@ -222,7 +221,7 @@ export default class Model extends EventEmitter {
             }
         // else, reset properties but keep this reference (not recursive)
         } else {
-            this.unsetMultiple(keys(this._data));
+            this.unsetMultiple(Object.keys(this._data));
             this.update(data, flags);
         }
     }

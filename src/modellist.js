@@ -60,7 +60,9 @@ export default class ModelList {
     set items(value) {
         this.reset(value);
     }
-
+    /**
+     * Get/set array of models in list.
+     */
     get models() {
         return this._items.map(item => {
             return this._handler.getModel(item);
