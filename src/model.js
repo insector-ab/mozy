@@ -303,7 +303,7 @@ export default class Model extends EventEmitter {
      * @param {...} args Arguments passed to listeners.
      */
     dispatchEvent(eventType, ...args) {
-        this.emit(eventType, ...args);
+        this.emit(eventType, ...[this].concat(args));
     }
     /**
      * Dispatch change events.
