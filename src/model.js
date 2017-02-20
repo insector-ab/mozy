@@ -42,14 +42,8 @@ export default class Model extends EventEmitter {
      */
     constructor(data = {}, ...args) {
         super();
-        // defaults
-        const defaultData = this._getDefaults(...args);
-        // Update undefined props from defaults
-        for (let prop in defaultData) {
-            if (defaultData.hasOwnProperty(prop) && isUndefined(data[prop])) {
-                data[prop] = defaultData[prop];
-            }
-        }
+        // Update with defaults
+        this._withDefaults(data, ...args);
         // Validate data
         this._validate(data);
         // Valid, set
@@ -195,6 +189,7 @@ export default class Model extends EventEmitter {
     /**
      * Delete multiple properties from data.
      * @param {list of strings} properties
+     * @return {Model} The Model object.
      */
     unsetMultiple(...properties) {
         for (let prop of properties) {
@@ -204,13 +199,22 @@ export default class Model extends EventEmitter {
         if (this.hasChanged(...properties)) {
             this.updateModified();
         }
+        // Return
+        return this;
     }
     /**
      * Reset underlying data object for model.
      * @param {Object}  data JSON serializable object.
      * @param {Integer} flags (@see constants).
+     * @return {Model} The Model object.
      */
     reset(data, flags = 0) {
+        data = data || {};
+        // Keep identity and uuid
+        const {uuid, identity} = this._data;
+        Object.assign(data, {uuid, identity});
+        // Update new data with defaults
+        this._withDefaults(data);
         // If reset reference flag
         if (flagIsSet(flags, RESET_REFERENCE)) {
             // Reset data reference
@@ -221,14 +225,21 @@ export default class Model extends EventEmitter {
             }
         // else, reset properties but keep this reference (not recursive)
         } else {
-            this.unsetMultiple(Object.keys(this._data));
+            // Unset all data
+            this.unsetMultiple(...Object.keys(this._data));
+            // Update
             this.update(data, flags);
         }
+        // Validate
+        this._validate(this._data);
+        // Return
+        return this;
     }
     /**
      * Recursively update model properties.
      * @param {Object} data JSON serializable object.
      * @param {Integer} flags (@see constants).
+     * @return {Model} The Model object.
      */
     update(data, flags = 0) {
         // Iterate data dict
@@ -243,30 +254,33 @@ export default class Model extends EventEmitter {
         if (!flagIsSet(flags, SET_SILENT)) {
             this.dispatchChange();
         }
+        // Return
+        return this;
     }
     /**
      * Update single property.
      * @param {String} property Name of property.
      * @param {*} value Anything JSON serializable.
      * @param {Integer} flags (@see constants).
+     * @return {Model} The Model object.
      */
     updateProperty(property, value, flags = 0) {
         // Check if setter exists
         if (typeof this.__lookupSetter__(property) !== 'undefined') {
             this[property] = value;
-            return;
+            return this;
         }
         // No setter, check if getter returns model
         const currentVal = this[property];
         if (currentVal && isFunction(currentVal.update)) {
             // If yes, update recursively.
             currentVal.update(value);
-            return;
+            return this;
         }
         // Soft update
         if (flagIsSet(flags, SOFT_UPDATE)) {
             this.set(property, value, SET_SILENT);
-            return;
+            return this;
         }
         // If no setter or sub model, throw error.
         throw new Error('Could not update property "' + property + '" on ' + this.constructor.name + '.');
@@ -274,9 +288,12 @@ export default class Model extends EventEmitter {
     /**
      * Update modified timestamp.
      * @param {timestamp} modified Time of modification or undefined if now.
+     * @return {Model} The Model object.
      */
     updateModified(modified) {
         this._modified = modified || Date.now();
+        // Return
+        return this;
     }
     /**
      * Return a copy of this model, with new uuids.
@@ -300,48 +317,60 @@ export default class Model extends EventEmitter {
      * Currently alias for EventEmitter.emit. May change.
      * @param {String} eventType Event type key.
      * @param {...} args Arguments passed to listeners.
+     * @return {Model} The Model object.
      */
     dispatchEvent(eventType, ...args) {
         this.emit(eventType, ...[this].concat(args));
+        // Return
+        return this;
     }
     /**
      * Dispatch change events.
      * @param {String} property Name of property.
      * @param {*} newValue Anything JSON serializable.
      * @param {*} oldValue Anything JSON serializable.
+     * @return {Model} The Model object.
      */
     dispatchChange(property, newValue, oldValue) {
         if (property) {
             this.dispatchEvent('change ' + property, newValue, oldValue);
         }
-        this.dispatchEvent('change', this);
+        return this.dispatchEvent('change', this);
     }
     /**
      * Alias for EventEmitter.addListener
      */
     addEventListener(event, listener) {
         this.addListener(event, listener);
+        // Return
+        return this;
     }
     /**
      * Alias for EventEmitter.removeListener
      */
     removeEventListener(event, listener) {
         this.removeListener(event, listener);
+        // Return
+        return this;
     }
     /**
      * Dispose model and sub models recursively.
      * Remove event listeners and delete references.
+     * @return {Model} The Model object.
      */
     dispose() {
-        this.removeAllListeners();
+        // Remove event listeners
+        this.removeAllListeners()
         // Check sub models on this, recursively
-        for (let attr in this) {
+        Object.keys(this).forEach(attr => {
             if (isObject(this[attr]) && isFunction(this[attr].dispose)) {
                 this[attr].dispose();
             }
-        }
+        });
         // delete refs
         this._deleteReferences();
+        // Return
+        return this;
     }
     /**
      * Delete references set on model.
@@ -370,6 +399,23 @@ export default class Model extends EventEmitter {
             // model uuid
             uuid: uuidV4()
         };
+    }
+    /**
+     * Update data object with defaults.
+     * @param {Object} data JSON serializable object.
+     * @param {...} constructorArgs List of arguments passed in constructor.
+     * @return {Model} The Model object.
+     */
+    _withDefaults(data, ...constructorArgs) {
+        // defaults
+        const defaultData = this._getDefaults(...constructorArgs);
+        // Update undefined props from defaults
+        Object.keys(defaultData).forEach(prop => {
+            if (isUndefined(data[prop])) {
+                data[prop] = defaultData[prop];
+            }
+        });
+        return this;
     }
     /**
      * Return unique client id.
