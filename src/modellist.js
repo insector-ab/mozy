@@ -45,7 +45,7 @@ export default class ModelList {
         // Handler object for getting models and storing items.
         this._handler = handler;
         // Modifed timestamp
-        this._modified = null;
+        this._modified = undefined;
         // Uuid
         this.uuid = uuidV4();
     }
@@ -82,15 +82,15 @@ export default class ModelList {
      * Interface for Model.updateProperty.
      * @param {Array} items List of anything JSON serializable.
      */
-    update(items) {
-        this.reset(items);
+    update(items, flags = 0) {
+        this.reset(items, flags);
     }
 
     at(index) {
         if (this.items[index]) {
             return this._handler.getModel(this.items[index]);
         }
-        return null;
+        return undefined;
     }
 
     add(model) {
@@ -134,7 +134,7 @@ export default class ModelList {
             this._items = items;
         // else, keep reference and replace items
         } else {
-            this._items.splice(0, undefined, ...items);
+            this._items.splice(0, this._items.length, ...items);
         }
         // modified
         return this.updateModified();
@@ -143,6 +143,12 @@ export default class ModelList {
     map(callback) {
         return this._items.map((item, index) => {
             return callback(this._handler.getModel(item), index);
+        });
+    }
+
+    forEach(callback) {
+        return this._items.forEach((item, index) => {
+            callback(this._handler.getModel(item), index);
         });
     }
     /**

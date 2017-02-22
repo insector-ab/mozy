@@ -51,7 +51,7 @@ export default class Model extends EventEmitter {
         // Store previous
         this._previousData = {};
         // Store modified
-        this._modified = null;
+        this._modified = undefined;
         // Client id
         this._cid = this._getUniqueClientId();
     }
@@ -225,10 +225,23 @@ export default class Model extends EventEmitter {
             }
         // else, reset properties but keep this reference (not recursive)
         } else {
-            // Unset all data
-            this.unsetMultiple(...Object.keys(this._data));
-            // Update
-            this.update(data, flags);
+            // Unset properties not in data
+            Object.keys(this._data).forEach(property => {
+                if (isUndefined(data[property])) {
+                    this.unset(property, flags);
+                }
+            })
+            // Recursive reset or updateProperty
+            Object.keys(this._data).forEach(property => {
+                // Check recursiveness
+                let currentVal = this[property];
+                if (currentVal && isFunction(currentVal.reset)) {
+                    currentVal.reset(data[property], flags);
+                // Just update
+                } else {
+                    this.updateProperty(property, data[property], flags)
+                }
+            });
         }
         // Validate
         this._validate(this._data);
@@ -243,11 +256,9 @@ export default class Model extends EventEmitter {
      */
     update(data, flags = 0) {
         // Iterate data dict
-        for (let prop in data) {
-            if (data.hasOwnProperty(prop)) {
-                this.updateProperty(prop, data[prop], flags);
-            }
-        }
+        Object.keys(data).forEach(prop => {
+            this.updateProperty(prop, data[prop], flags);
+        });
         // Set modified
         this.updateModified();
         // Notify if not silent. Dispatch for each property?

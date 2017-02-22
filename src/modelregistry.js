@@ -1,5 +1,6 @@
 import isObject from 'lodash.isobject';
 import isFunction from 'lodash.isfunction';
+import isArray from 'lodash.isarray';
 import Registry, {InvalidRegistryKeyError} from './registry';
 import Model from './model';
 import ModelList, {getModelListHandler, getRelationListHandler} from './modellist';
@@ -112,7 +113,7 @@ export default class ModelRegistry extends Registry {
             return [key, this.get(key)];
         }
         // return without model
-        return [key, null];
+        return [key, undefined];
     }
     /**
      * Get existing model in registry or create new.
@@ -151,6 +152,10 @@ export default class ModelRegistry extends Registry {
      * @return {ModelList} New or registered ModelList.
      */
     getModelList(items, key, handler) {
+        // Require items
+        if (!isArray(items)) {
+            throw new TypeError('Argument items must be Array');
+        }
         let modelList;
         // Require valid key
         if (!this.isValidKey(key)) {
@@ -160,9 +165,9 @@ export default class ModelRegistry extends Registry {
         if (this.has(key)) {
             modelList = this.get(key);
         }
-        // Don't allow getting registered modelList with different items array
+        // If different items array in modelList, update.
         if (modelList && modelList.items !== items) {
-            throw new Error('Items array mismatch.');
+            modelList.items = items;
         }
         // No modelList found, create new modelList and register
         if (!modelList) {
