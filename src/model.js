@@ -285,13 +285,12 @@ export default class Model extends EventEmitter {
         const currentVal = this[property];
         if (currentVal && isFunction(currentVal.update)) {
             // If yes, update recursively.
-            currentVal.update(value);
+            currentVal.update(value, flags);
             return this;
         }
         // Soft update
         if (flagIsSet(flags, SOFT_UPDATE)) {
-            this.set(property, value, SET_SILENT);
-            return this;
+            return this.set(property, value, flags);
         }
         // If no setter or sub model, throw error.
         throw new Error('Could not update property "' + property + '" on ' + this.constructor.name + '.');
