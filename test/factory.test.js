@@ -10,7 +10,7 @@ chai.should();
  */
 class CustomMap {
     constructor(iterable) {
-        this._map = Object.create(undefined);
+        this._map = Object.create(null);
         for (let [key, value] of iterable) {
             this._map[key] = value;
         }
