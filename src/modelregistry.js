@@ -1,6 +1,5 @@
 import isObject from 'lodash.isobject';
 import isFunction from 'lodash.isfunction';
-import isArray from 'lodash.isarray';
 import Registry, {InvalidRegistryKeyError} from './registry';
 import Model from './model';
 import ModelList, {getModelListHandler, getRelationListHandler} from './modellist';
@@ -153,7 +152,7 @@ export default class ModelRegistry extends Registry {
      */
     getModelList(items, key, handler) {
         // Require items
-        if (!isArray(items)) {
+        if (!Array.isArray(items)) {
             throw new TypeError('Argument items must be Array');
         }
         let modelList;
