@@ -31,7 +31,7 @@
     "test": "mocha --compilers js:babel-core/register ./test/**/*.test.js",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register ./test/**/*.test.js",
     "build": "babel src --out-dir .",
-    "link": "npm run build; jspm link -y npm:mozy",
+    "watch": "babel src --watch --out-dir .",
     "prepublish": "npm run build"
   },
   "repository": {
