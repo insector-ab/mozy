@@ -32,7 +32,8 @@
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register ./test/**/*.test.js",
     "build": "babel src --out-dir .",
     "watch": "babel src --watch --out-dir .",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "lint": "eslint src/**.js"
   },
   "repository": {
     "type": "git",
