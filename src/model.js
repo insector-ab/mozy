@@ -230,7 +230,7 @@ export default class Model extends EventEmitter {
                 if (isUndefined(data[property])) {
                     this.unset(property, flags);
                 }
-            })
+            });
             // Recursive reset or updateProperty
             Object.keys(this._data).forEach(property => {
                 // Check recursiveness
@@ -239,7 +239,7 @@ export default class Model extends EventEmitter {
                     currentVal.reset(data[property], flags);
                 // Just update
                 } else {
-                    this.updateProperty(property, data[property], flags)
+                    this.updateProperty(property, data[property], flags);
                 }
             });
         }
@@ -330,7 +330,7 @@ export default class Model extends EventEmitter {
      * @return {Model} The Model object.
      */
     dispatchEvent(eventType, ...args) {
-        this.emit(eventType, ...[this].concat(args));
+        this.emit(eventType, [this].concat(args));
         // Return
         return this;
     }
@@ -345,7 +345,7 @@ export default class Model extends EventEmitter {
         if (property) {
             this.dispatchEvent('change ' + property, newValue, oldValue);
         }
-        return this.dispatchEvent('change', this);
+        return this.dispatchEvent('change');
     }
     /**
      * Alias for EventEmitter.addListener
@@ -370,7 +370,7 @@ export default class Model extends EventEmitter {
      */
     dispose() {
         // Remove event listeners
-        this.removeAllListeners()
+        this.removeAllListeners();
         // Check sub models on this, recursively
         Object.keys(this).forEach(attr => {
             if (isObject(this[attr]) && isFunction(this[attr].dispose)) {
