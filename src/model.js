@@ -330,7 +330,7 @@ export default class Model extends EventEmitter {
      * @return {Model} The Model object.
      */
     dispatchEvent(eventType, ...args) {
-        this.emit(eventType, [this].concat(args));
+        this.emit(eventType, ...[eventType, this].concat(args));
         // Return
         return this;
     }
