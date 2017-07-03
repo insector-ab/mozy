@@ -108,15 +108,16 @@ export default class ModelList {
         // index
         const index = this.indexOf(model);
         // Remove, update modified and return this.
-        return this.removeAt(index).updateModified();
+        return this.removeAt(index);
     }
 
     removeAt(index) {
         // Remove obj at index
         this._items.splice(index, 1);
-        // use remove method
-        return this;
+        // Update modified and return this.
+        return this.updateModified();
     }
+
     /**
      * Return index of model in list.
      * @param {Model} model The Model to find the index of.
