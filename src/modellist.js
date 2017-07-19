@@ -1,5 +1,6 @@
 import uuidV4 from 'uuid/v4';
-import {RESET_REFERENCE, flagIsSet} from './model';
+import isObject from 'lodash.isobject';
+import {DISPOSE, RESET_REFERENCE, flagIsSet} from './model';
 
 /**
  * Get default ModelList handler object.
@@ -13,6 +14,12 @@ export function getModelListHandler(modelRegistry) {
         },
         getItem: function(model) {
             return model.getModelData();
+        },
+        findModel: function(item) {
+            return modelRegistry.get(modelRegistry.getValidKeyIn(item));
+        },
+        disposeModel: function(item) {
+            return modelRegistry.disposeModelByKey(modelRegistry.getValidKeyIn(item));
         }
     };
 }
@@ -30,6 +37,12 @@ export function getRelationListHandler(modelRegistry, keyAttr = 'uuid') {
         },
         getItem: function(model) {
             return model[keyAttr];
+        },
+        findModel: function(key) {
+            return modelRegistry.get(key);
+        },
+        disposeModel: function(key) {
+            return modelRegistry.disposeModelByKey(key);
         }
     };
 }
@@ -83,7 +96,36 @@ export default class ModelList {
      * @param {Array} items List of anything JSON serializable.
      */
     update(items, flags = 0) {
-        this.reset(items, flags);
+        const models = this.models;
+        const il = models.length;
+        let i, model;
+        const itemStr = JSON.stringify(items);
+        // remove missing models
+        for (i = il - 1; i >= 0; i--) {
+            model = this.at(i);
+            // not found in new array
+            if (itemStr.indexOf(model.uuid) === -1) {
+                this.remove(model, flags);
+            }
+        }
+        // add & update
+        items.forEach((item, i) => {
+            // nothing to update
+            if (!isObject(item)) {
+                return;
+            }
+            // find model
+            model = this._handler.findModel(item);
+            // update model
+            if (model) {
+                model.update(item, flags);
+            // add new
+            } else {
+                this.addAt(this._handler.getModel(item), i);
+            }
+        });
+        // modified
+        return this.updateModified();
     }
 
     at(index) {
@@ -104,14 +146,17 @@ export default class ModelList {
         return this.updateModified();
     }
 
-    remove(model) {
+    remove(model, flags = 0) {
         // index
         const index = this.indexOf(model);
         // Remove, update modified and return this.
-        return this.removeAt(index);
+        return this.removeAt(index, flags);
     }
 
-    removeAt(index) {
+    removeAt(index, flags = 0) {
+        if (flagIsSet(flags, DISPOSE)) {
+            this._handler.disposeModel(this.items[index]);
+        }
         // Remove obj at index
         this._items.splice(index, 1);
         // Update modified and return this.
@@ -129,6 +174,12 @@ export default class ModelList {
     }
 
     reset(items, flags = 0) {
+        // dispose models
+        if (flagIsSet(flags, DISPOSE)) {
+            this._items.forEach(item => {
+                this._handler.disposeModel(item);
+            });
+        }
         // If RESET_REFERENCE flag
         if (flagIsSet(flags, RESET_REFERENCE)) {
             // Set new reference

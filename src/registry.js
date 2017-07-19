@@ -1,4 +1,5 @@
 import ExtendableError from 'es6-error';
+import isObject from 'lodash.isobject';
 import isUndefined from 'lodash.isundefined';
 import isFunction from 'lodash.isfunction';
 
@@ -127,6 +128,32 @@ export default class Registry {
         }
         // No validation
         return true;
+    }
+    /**
+     * Dispose register.
+     * Remove keys and delete references.
+     * @return {Registry} The Registry object.
+     */
+    dispose() {
+        // Check _map for disposable objects
+        Object.keys(this._map).forEach(attr => {
+            if (isObject(this._map[attr]) && isFunction(this._map[attr].dispose)) {
+                this._map[attr].dispose();
+            }
+        });
+        // delete refs
+        this._deleteReferences();
+        // Return
+        return this;
+    }
+    /**
+     * Delete references set on registry.
+     */
+    _deleteReferences() {
+        delete this._map;
+        delete this._allowOverrides;
+        delete this._defaultAllowOverrides;
+        delete this._keyValidator;
     }
 }
 

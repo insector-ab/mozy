@@ -2,7 +2,7 @@ import isObject from 'lodash.isobject';
 import isFunction from 'lodash.isfunction';
 import Registry, {InvalidRegistryKeyError} from './registry';
 import Model from './model';
-import ModelList, {getModelListHandler, getRelationListHandler} from './modellist';
+// import ModelList, {getModelListHandler, getRelationListHandler} from './modellist';
 import Factory from './factory';
 
 /**
@@ -67,9 +67,9 @@ export default class ModelRegistry extends Registry {
      */
     validate(key, value) {
         super.validate(key, value);
-        // value must be instance of Model or ModelList
-        if (!(value instanceof Model || value instanceof ModelList)) {
-            throw new TypeError('Registry value must be instance of Model or ModelList.');
+        // value must be instance of Model
+        if (!(value instanceof Model)) {
+            throw new TypeError('Registry value must be instance of Model.');
         }
         return this;
     }
@@ -147,45 +147,58 @@ export default class ModelRegistry extends Registry {
         return model;
     }
     /**
+     * Dispose existing model in registry
+     * @param {*} key The key of the element to dispoe & delete from the Registry.
+     * @return {boolean} True if key found and deleted.
+     */
+    // disposeModelByKey(key) {
+    //     const model = this.get(key);
+    //     // dispose
+    //     if (model && typeof model.dispose === 'function') {
+    //         model.dispose();
+    //     }
+    //     return super.delete(key);
+    // }
+    /**
      * Get existing ModelList in registry or create new.
      * @return {ModelList} New or registered ModelList.
      */
-    getModelList(items, key, handler) {
-        // Require items
-        if (!Array.isArray(items)) {
-            throw new TypeError('Argument items must be Array');
-        }
-        let modelList;
-        // Require valid key
-        if (!this.isValidKey(key)) {
-            throw new InvalidRegistryKeyError(key, items);
-        }
-        // If registered
-        if (this.has(key)) {
-            modelList = this.get(key);
-        }
-        // If different items array in modelList, update.
-        if (modelList && modelList.items !== items) {
-            modelList.items = items;
-        }
-        // No modelList found, create new modelList and register
-        if (!modelList) {
-            // New
-            modelList = new ModelList(items, handler || getModelListHandler(this));
-            // Register
-            this.set(key, modelList);
-        }
-        // Return existing or new modelList
-        return modelList;
-    }
+    // getModelList(items, key, handler) {
+    //     // Require items
+    //     if (!Array.isArray(items)) {
+    //         throw new TypeError('Argument items must be Array');
+    //     }
+    //     let modelList;
+    //     // Require valid key
+    //     if (!this.isValidKey(key)) {
+    //         throw new InvalidRegistryKeyError(key, items);
+    //     }
+    //     // If registered
+    //     if (this.has(key)) {
+    //         modelList = this.get(key);
+    //     }
+    //     // If different items array in modelList, update.
+    //     if (modelList && modelList.items !== items) {
+    //         modelList.items = items;
+    //     }
+    //     // No modelList found, create new modelList and register
+    //     if (!modelList) {
+    //         // New
+    //         modelList = new ModelList(items, handler || getModelListHandler(this));
+    //         // Register
+    //         this.set(key, modelList);
+    //     }
+    //     // Return existing or new modelList
+    //     return modelList;
+    // }
     /**
      * Same as getModelList but with default relation list handler.
      * @return {ModelList} New or registered ModelList.
      */
-    getRelationList(items, key, keyAttr) {
-        const handler = getRelationListHandler(this, keyAttr || this.keyAttr);
-        return this.getModelList(items, key, handler);
-    }
+    // getRelationList(items, key, keyAttr) {
+    //     const handler = getRelationListHandler(this, keyAttr || this.keyAttr);
+    //     return this.getModelList(items, key, handler);
+    // }
     /**
      * Create new model instance using factory.
      * @param {Object} data JSON serializable object.
@@ -231,6 +244,14 @@ export default class ModelRegistry extends Registry {
         }
         return true;
     }
+    /**
+     * Delete references set on registry.
+     */
+    _deleteReferences() {
+        delete this._keyAttr;
+        delete this._factory;
+    }
+
 }
 
 // Store multitons

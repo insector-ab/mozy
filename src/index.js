@@ -1,5 +1,5 @@
 import Model, {identities} from './model';
-import ModelList from './modellist';
+// import ModelList from './modellist';
 import Factory from './factory';
 import Registry from './registry';
 import ModelRegistry from './modelregistry';
@@ -7,7 +7,7 @@ import ModelRegistry from './modelregistry';
  * Mozy classes
  */
 export { Model };
-export { ModelList };
+// export { ModelList };
 export { Factory };
 export { Registry };
 export { ModelRegistry };
@@ -28,7 +28,7 @@ export const modelRegistry = new ModelRegistry('uuid', modelFactory);
  */
 export default {
     Model,
-    ModelList,
+    // ModelList,
     Factory,
     Registry,
     ModelRegistry,
