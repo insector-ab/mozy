@@ -421,11 +421,21 @@ export default class Model extends EventEmitter {
         const defaultData = this._getDefaults(...constructorArgs);
         // Update undefined props from defaults
         Object.keys(defaultData).forEach(prop => {
-            if (isUndefined(data[prop])) {
+            if (this._shouldSetDefaultValue(prop, data[prop])) {
                 data[prop] = defaultData[prop];
             }
         });
         return this;
+    }
+    /**
+     * Return true if _withDefaults should set the default
+     * value for this property.
+     * @param {String} property Name of property.
+     * @param {*} value Anything JSON serializable.
+     * @return {Boolean}
+     */
+    _shouldSetDefaultValue(property, value) {
+        return isUndefined(value);
     }
     /**
      * Return unique client id.
