@@ -159,10 +159,10 @@ export class Dimensions extends mozy.Model {
     _getDefaults() {
         let d = super._getDefaults();
         d.identity = Dimensions.identity;
-        d.contentBox = (new Rect()).getModelData();
-        d.padding = (new EdgeSizes()).getModelData();
-        d.borderWidth = (new EdgeSizes()).getModelData();
-        d.margin = (new EdgeSizes()).getModelData();
+        d.contentBox = (new Rect()).getRawModelData();
+        d.padding = (new EdgeSizes()).getRawModelData();
+        d.borderWidth = (new EdgeSizes()).getRawModelData();
+        d.margin = (new EdgeSizes()).getRawModelData();
         return d;
     }
 

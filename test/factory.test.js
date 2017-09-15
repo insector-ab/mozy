@@ -99,8 +99,8 @@ describe('Factory', () => {
                 getIdentityOfUndefined.should.throw(TypeError);
             });
             // Check return type of Model instance
-            it('should return Model.identity for (new Model()).getModelData()', function() {
-                factory.getIdentityOf(model.getModelData()).should.equal(Model.identity);
+            it('should return Model.identity for (new Model()).getRawModelData()', function() {
+                factory.getIdentityOf(model.getRawModelData()).should.equal(Model.identity);
             });
         });
     });

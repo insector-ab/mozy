@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import cloneDeep from 'lodash.clonedeep';
 import uniqueId from 'lodash.uniqueid';
 import isObject from 'lodash.isobject';
 import isFunction from 'lodash.isfunction';
@@ -47,7 +48,7 @@ export default class Model extends EventEmitter {
         // Validate data
         this._validate(data);
         // Valid, set
-        this._data = data;
+        this._data = this._parseModelData(data);
         // Store previous
         this._previousData = {};
         // Store modified
@@ -80,8 +81,23 @@ export default class Model extends EventEmitter {
      * Underlying data object for model.
      * @return {Object} JSON serializable object.
      */
-    getModelData() {
+    getRawModelData() {
         return this._data;
+    }
+    /**
+     * Cloned underlying data object for model.
+     * @return {Object} JSON serializable object.
+     */
+    getModelData() {
+        return cloneDeep(this.getRawModelData());
+    }
+    /**
+     * Return parsed data object for model.
+     * @param {...} data object for model.
+     * @return {Object} Default data (JSON serializable object) for Model.
+     */
+    _parseModelData(data) {
+        return data;
     }
     /**
      * Get value of data.property.
@@ -255,6 +271,7 @@ export default class Model extends EventEmitter {
      * @return {Model} The Model object.
      */
     update(data, flags = 0) {
+        data = this._parseModelData(data);
         // Iterate data dict
         Object.keys(data).forEach(prop => {
             this.updateProperty(prop, data[prop], flags);

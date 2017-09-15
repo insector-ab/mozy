@@ -127,7 +127,7 @@ export default class ModelRegistry extends Registry {
             [key, model] = this.getEntryForData(data);
         }
         // Don't allow getting registered models with different data object
-        if (model && model.getModelData() !== data) {
+        if (model && model.getRawModelData() !== data) {
             throw new Error('Data object mismatch.');
         }
         // No model found, create new model and register
@@ -139,7 +139,7 @@ export default class ModelRegistry extends Registry {
                 model = this.newInstanceFor(data);
             }
             // Get key in data
-            key = this.getValidKeyIn(model.getModelData());
+            key = this.getValidKeyIn(model.getRawModelData());
             // Register
             this.set(key, model);
         }
@@ -224,7 +224,7 @@ export default class ModelRegistry extends Registry {
      */
     registerModel(model) {
         // Get valid key
-        const key = this.getValidKeyIn(model.getModelData());
+        const key = this.getValidKeyIn(model.getRawModelData());
         // register the model
         return this.set(key, model);
     }

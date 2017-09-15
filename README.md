@@ -118,7 +118,7 @@ dim.padding.right = 10;
 dim.borderWidth.top = 1;
 dim.borderWidth.bottom = 1;
 
-const jsonStr = JSON.stringify(dim.getModelData());
+const jsonStr = JSON.stringify(dim.getRawModelData());
 console.log(jsonStr);
 ```
 

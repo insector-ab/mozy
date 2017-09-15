@@ -13,7 +13,7 @@ export function getModelListHandler(modelRegistry) {
             return modelRegistry.getModel(item);
         },
         getItem: function(model) {
-            return model.getModelData();
+            return model.getRawModelData();
         },
         findModel: function(item) {
             return modelRegistry.get(modelRegistry.getValidKeyIn(item));
