@@ -85,6 +85,12 @@ describe('Factory', () => {
       describeWithMap(customMap);
     });
 
+    describe('Using an identityGetter', () => {
+      const factory = new Factory(modelIdentities, obj => 'mozy.' + obj.identity);
+      const model = factory.newInstanceFor({identity: 'Model'});
+      model.should.be.an.instanceof(Model);
+    });
+
   });
 
   // API
@@ -245,6 +251,40 @@ describe('Factory', () => {
           factory.requireConstructorFor({identity: 'an.unknown.identity'});
         };
         requireConstructorForObjectWithUnknownIdentity.should.throw(TypeError);
+      });
+
+    });
+
+    // Method: newInstance
+    describe('.newInstance(identity, ...constructorArgs)', () => {
+      const factory = new Factory(modelIdentities);
+
+      it('should return an instance for identity present in factory\'s identity map', function() {
+        factory.newInstance(Model.identity).should.be.an.instanceof(Model);
+      });
+
+      it('should throw error for identity NOT present in factory\'s identity map', function() {
+        const newInstanceOfUnknownIdentity = function() {
+          factory.newInstance('an.unknown.identity');
+        };
+        newInstanceOfUnknownIdentity.should.throw(TypeError);
+      });
+
+    });
+
+    // Method: newInstanceFor
+    describe('.newInstanceFor(obj, ...constructorArgs)', () => {
+      const factory = new Factory(modelIdentities);
+
+      it('should return an instance for object with identity present in factory\'s identity map', function() {
+        factory.newInstanceFor({identity: Model.identity}).should.be.an.instanceof(Model);
+      });
+
+      it('should throw error for object with identity NOT present in factory\'s identity map', function() {
+        const newInstanceOfUnknownIdentity = function() {
+          factory.newInstance({identity: 'an.unknown.identity'});
+        };
+        newInstanceOfUnknownIdentity.should.throw(TypeError);
       });
 
     });
