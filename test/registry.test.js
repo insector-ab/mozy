@@ -26,8 +26,8 @@ describe('Registry', () => {
     // Write
   });
 
-  // API
-  describe('API', () => {
+  // Interface
+  describe('Interface', () => {
 
     describe('constructor(factory, map, options = {})', () => {
 

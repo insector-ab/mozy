@@ -19,8 +19,8 @@ describe('Model', () => {
   describe('Use cases', () => {
     // Write
   });
-  // API
-  describe('API', () => {
+  // Interface
+  describe('Interface', () => {
     // Attribute: uuid
     describe('.uuid', () => {
       // Check type

@@ -86,15 +86,17 @@ describe('Factory', () => {
     });
 
     describe('Using an identityGetter', () => {
-      const factory = new Factory(modelIdentities, obj => 'mozy.' + obj.identity);
-      const model = factory.newInstanceFor({identity: 'Model'});
-      model.should.be.an.instanceof(Model);
+      it('should return new instance of computed identity', function() {
+        const factory = new Factory(modelIdentities, obj => 'mozy.' + obj.discriminator);
+        const model = factory.newInstanceFor({discriminator: 'Model'});
+        model.should.be.an.instanceof(Model);
+      });
     });
 
   });
 
-  // API
-  describe('API', () => {
+  // Interface
+  describe('Interface', () => {
 
     // Constructor
     describe('constructor(constructorMap, identityGetter)', () => {
