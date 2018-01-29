@@ -63,7 +63,7 @@ export class Dimensions extends mozy.Model {
   }
 
   _getModel(property) {
-    return mozy.registry.getModel(this.get(property));
+    return mozy.modelRegistry.getModel(this.get(property));
   }
 
   _getDefaults() {
@@ -83,9 +83,9 @@ Dimensions.identity = 'layout.Dimensions';
 /**
  * Register identities
  */
-mozy.identities.set(Rect.identity,       Rect);
-mozy.identities.set(EdgeSizes.identity,  EdgeSizes);
-mozy.identities.set(Dimensions.identity, Dimensions);
+mozy.modelIdentities.set(Rect.identity,       Rect);
+mozy.modelIdentities.set(EdgeSizes.identity,  EdgeSizes);
+mozy.modelIdentities.set(Dimensions.identity, Dimensions);
 ```
 
 ## Using models
@@ -156,7 +156,7 @@ Or, if root constructor is unknown, using the registry:
 
 ```javascript
 const data = JSON.parse(jsonStr);
-const model = mozy.registry.getModel(data);
+const model = mozy.modelRegistry.getModel(data);
 console.log(model.padding.right) // 10
 ```
 
@@ -166,6 +166,17 @@ console.log(model.padding.right) // 10
 
 ```sh
 npm test
+```
+```
+-------------|----------|----------|----------|----------|----------------|
+File         |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+-------------|----------|----------|----------|----------|----------------|
+All files    |    50.26 |    37.16 |    56.44 |    49.49 |                |
+ factory.js  |    96.67 |    83.33 |      100 |      100 |        7,13,15 |
+ index.js    |      100 |       75 |      100 |      100 |             20 |
+ model.js    |    44.12 |    31.65 |       50 |    38.74 |... 402,438,439 |
+ registry.js |    34.48 |    26.67 |    38.46 |    33.87 |... 433,436,446 |
+-------------|----------|----------|----------|----------|----------------|
 ```
 
 ## Changelog
