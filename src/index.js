@@ -18,7 +18,7 @@ export const modelFactory = new Factory(modelIdentities);
 /**
  * Model registry
  */
-export const modelRegistry = new ModelRegistry('uuid', modelFactory);
+export const modelRegistry = new ModelRegistry(modelFactory);
 /**
  * Mozy export
  */
