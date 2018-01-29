@@ -40,6 +40,13 @@ export default class Model extends EventEmitter {
     return cloneDeep(this._data);
   }
   /**
+   * Underlying data object reference.
+   * @return {Object} JSON serializable object.
+   */
+  getRawModelData() {
+    return this._data;
+  }
+  /**
    * Get value of data.property.
    * @param {String} property Name of property.
    * @param {*} defaultValue Default value to return if property is undefined.

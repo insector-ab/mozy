@@ -172,15 +172,15 @@ npm test
 
 ### 0.2.0
 * Switched indentation from 4 spaces to 2.
-* Removed class Registry (registry.js). Use Map instead.
+* Merged ModelRegistry and Registry into Registry.
 * Model:
   - Rewrite (simplified).
   - Now extends npm:wolfy87-eventemitter instead of npm:events.
 * Factory:
   - Removed dependencies.
-* ModelRegistry:
-  - Now extends Object instead of Registry.
-  - Merged some code previously in Registry.
+* Tests
+  - More tests.
+  - Replaced istanbul coverage with nyc.
 
 ## License
 

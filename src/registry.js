@@ -19,16 +19,15 @@ const defaultOptions = {
   keyValidator: key => typeof key === 'string'
 };
 /**
- * ModelRegistry
+ * Registry
  */
-export default class ModelRegistry {
+export default class Registry {
   /**
-   * ModelRegistry.constructor
+   * Registry.constructor
    * @param {Factory|Function} factory Model factory.
-   * @param {Map} map Map instance to use for registration.
    * @param {Object} options See defaultOptions.
    */
-  constructor(factory, map, options = {}) {
+  constructor(factory, {map, ...options} = {}) {
     // Require valid factory
     if (!factory) {
       throw new TypeError('Argument factory required.');
@@ -143,7 +142,7 @@ export default class ModelRegistry {
   /**
    * Register model.
    * @param {Model} model The model instance to register.
-   * @return {ModelRegistry} The ModelRegistry object.
+   * @return {Registry} The Registry object.
    */
   register(model) {
     // Get valid key
@@ -166,7 +165,7 @@ export default class ModelRegistry {
    * Validate key and value. If not valid throw error.
    * @param {*} key The key to Validate.
    * @param {*} value Tha value to validate.
-   * @return {ModelRegistry} The ModelRegistry object.
+   * @return {Registry} The Registry object.
    */
   validate(key, value) {
     // Valid key?
@@ -179,7 +178,7 @@ export default class ModelRegistry {
     }
     // value must be instance of Model
     if (!(value instanceof Model)) {
-      throw new TypeError('ModelRegistry value must be instance of Model.');
+      throw new TypeError('Registry value must be instance of Model.');
     }
     return this;
   }
@@ -223,7 +222,7 @@ export default class ModelRegistry {
    * Map.set API
    * @param {*} key The key of the element to add to the Registry.
    * @param {*} value The value of the element to add to the Registry.
-   * @return {ModelRegistry} The ModelRegistry object.
+   * @return {Registry} The Registry object.
    */
   set(key, value) {
     // Validate
@@ -276,18 +275,18 @@ export default class ModelRegistry {
 }
 
 // Store multitons
-ModelRegistry._instances = new Map();
+Registry._instances = new Map();
 
 // Multiton getter
-ModelRegistry.get = function(name, ...constructorArgs) {
+Registry.get = function(name, ...constructorArgs) {
   // Instance exists?
-  if (ModelRegistry._instances.has(name)) {
-    return ModelRegistry._instances.get(name);
+  if (Registry._instances.has(name)) {
+    return Registry._instances.get(name);
   }
-  // Create new ModelRegistry
-  const reg = new ModelRegistry(...constructorArgs);
+  // Create new Registry
+  const reg = new Registry(...constructorArgs);
   // Register
-  ModelRegistry._instances.set(name, reg);
+  Registry._instances.set(name, reg);
   // return
   return reg;
 };

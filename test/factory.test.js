@@ -216,6 +216,39 @@ describe('Factory', () => {
 
     });
 
+    // Method: getConstructorFor
+    describe('.getConstructorFor(obj)', () => {
+      const factory = new Factory(modelIdentities);
+      const model = new Model();
+
+      it('should return a function for object with identity present in factory\'s identity map', function() {
+        factory.getConstructorFor(model.getModelData()).should.be.a('function');
+      });
+
+      it('should return undefined for object with identity NOT present in factory\'s identity map', function() {
+        should.equal(factory.getConstructorFor({identity: 'an.unknown.identity'}), undefined);
+      });
+
+    });
+
+    // Method: requireConstructorFor
+    describe('.requireConstructorFor(obj)', () => {
+      const factory = new Factory(modelIdentities);
+      const model = new Model();
+
+      it('should return a function for object with identity present in factory\'s identity map', function() {
+        factory.requireConstructorFor(model.getModelData()).should.be.a('function');
+      });
+
+      it('should throw error for identity NOT present in factory\'s identity map', function() {
+        const requireConstructorForObjectWithUnknownIdentity = function() {
+          factory.requireConstructorFor({identity: 'an.unknown.identity'});
+        };
+        requireConstructorForObjectWithUnknownIdentity.should.throw(TypeError);
+      });
+
+    });
+
   });
 
 });
