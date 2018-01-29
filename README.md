@@ -1,4 +1,4 @@
-# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy)
+# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage-49%25-red.svg)
 A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_initialization), factories and instance registries.
 
 ## Installation
