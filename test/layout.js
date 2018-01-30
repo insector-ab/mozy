@@ -127,7 +127,7 @@ export class Dimensions extends mozy.Model {
   }
 
   _getModel(property) {
-    return mozy.registry.getModel(this.get(property));
+    return mozy.modelRegistry.getModel(this.get(property));
   }
 
   _getDefaults() {

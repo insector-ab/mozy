@@ -278,7 +278,8 @@ export default class Model extends EventEmitter {
   }
   /**
    * Return true if _withDefaultData should set the default
-   * value for this property.
+   * value for this property. Override to also set defaults
+   * for null values, for example.
    * @param {String} property Name of property.
    * @param {*} value Anything JSON serializable.
    * @return {Boolean}
