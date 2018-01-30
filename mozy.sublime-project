@@ -5,7 +5,7 @@
 			"path": ".",
 			"folder_exclude_patterns": [
 				"mozy/node_modules",
-				"mozy/coverage"
+				"mozy/.nyc_output"
 			],
 			"file_include_patterns": [
 				"mozy/src/*.js",
