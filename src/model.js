@@ -142,7 +142,7 @@ export default class Model extends EventEmitter {
     const {uuid, identity} = this._data;
     Object.assign(data, {uuid, identity});
     // Update data with defaults
-    data = Object.assign(this._withDefaultData(data), defaultData);
+    data = Object.assign(this._withDefaultData(data), this._parseData(defaultData));
     // Clear _data
     Object.keys(this._data).forEach(property => {
       delete this._data[property];
