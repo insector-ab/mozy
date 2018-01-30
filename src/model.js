@@ -43,7 +43,7 @@ export default class Model extends EventEmitter {
    * Underlying data object reference.
    * @return {Object} JSON serializable object.
    */
-  getRawModelData() {
+  getDataReference() {
     return this._data;
   }
   /**
