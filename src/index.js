@@ -1,16 +1,12 @@
 import Model, {identities} from './model';
-import ModelList from './modellist';
 import Factory from './factory';
 import Registry from './registry';
-import ModelRegistry from './modelregistry';
 /**
  * Mozy classes
  */
 export { Model };
-export { ModelList };
 export { Factory };
 export { Registry };
-export { ModelRegistry };
 /**
  * Model identities
  */
@@ -22,17 +18,15 @@ export const modelFactory = new Factory(modelIdentities);
 /**
  * Model registry
  */
-export const modelRegistry = new ModelRegistry('uuid', modelFactory);
+export const modelRegistry = new Registry(modelFactory);
 /**
  * Mozy export
  */
 export default {
-    Model,
-    ModelList,
-    Factory,
-    Registry,
-    ModelRegistry,
-    modelIdentities,
-    modelFactory,
-    modelRegistry
+  Model,
+  Factory,
+  Registry,
+  modelIdentities,
+  modelFactory,
+  modelRegistry
 };

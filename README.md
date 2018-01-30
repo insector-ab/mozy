@@ -1,5 +1,6 @@
-# mozy
+# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-69%25-yellow.svg)
 A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_initialization), factories and instance registries.
+
 
 ## Installation
 
@@ -7,25 +8,6 @@ A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_i
 npm install mozy
 ```
 
-## Test
-
-(WIP)
-
-```sh
-npm test
-```
-```sh
-npm run coverage
-```
-Current coverage:
-```
-=============================== Coverage summary ===============================
-Statements   : 40.12% ( 260/648 )
-Branches     : 27.18% ( 103/379 )
-Functions    : 36.77% ( 57/155 )
-Lines        : 36.5% ( 188/515 )
-================================================================================
-```
 
 ## Defining models
 
@@ -34,26 +16,26 @@ import mozy from 'mozy';
 
 export class Rect extends mozy.Model {
 
-    get x() {
-        return this.get('x');
-    }
-    set x(value) {
-        this.set('x', value);
-    }
+  get x() {
+    return this.get('x');
+  }
+  set x(value) {
+    this.set('x', value);
+  }
 
-    /**
-     * Skipping y, width, height ...
-     */
+  /**
+   * Skipping y, width, height ...
+   */
 
-    _getDefaults() {
-        const d = super._getDefaults();
-        d.identity = Rect.identity;
-        d.x = 0.0;
-        d.y = 0.0;
-        d.width = 0.0;
-        d.height = 0.0;
-        return d;
-    }
+  _getDefaults() {
+    return Object.assign(super._getDefaults(), {
+      identity: Rect.identity,
+      x: 0.0,
+      y: 0.0,
+      width: 0.0,
+      height: 0.0,
+    });
+  }
 
 }
 
@@ -65,35 +47,35 @@ Rect.identity = 'shape.Rect';
 
 export class Dimensions extends mozy.Model {
 
-    get contentBox() {
-        return this._getModel('contentBox');
-    }
+  get contentBox() {
+    return this._getModel('contentBox');
+  }
 
-    get padding() {
-        return this._getModel('padding');
-    }
+  get padding() {
+    return this._getModel('padding');
+  }
 
-    get borderWidth() {
-        return this._getModel('borderWidth');
-    }
+  get borderWidth() {
+    return this._getModel('borderWidth');
+  }
 
-    get margin() {
-        return this._getModel('margin');
-    }
+  get margin() {
+    return this._getModel('margin');
+  }
 
-    _getModel(property) {
-        return mozy.registry.getModel(this.get(property));
-    }
+  _getModel(property) {
+    return mozy.modelRegistry.getModel(this.get(property));
+  }
 
-    _getDefaults() {
-        const d = super._getDefaults();
-        d.identity = Dimensions.identity;
-        d.contentBox = {identity: Rect.identity};
-        d.padding = {identity: EdgeSizes.identity};
-        d.borderWidth = {identity: EdgeSizes.identity};
-        d.margin = {identity: EdgeSizes.identity};
-        return d;
-    }
+  _getDefaults() {
+    return Object.assign(super._getDefaults(), {
+      identity: Dimensions.identity,
+      contentBox: {identity: Rect.identity},
+      padding: {identity: EdgeSizes.identity},
+      borderWidth: {identity: EdgeSizes.identity},
+      margin: {identity: EdgeSizes.identity}
+    });
+  }
 
 }
 
@@ -102,10 +84,11 @@ Dimensions.identity = 'layout.Dimensions';
 /**
  * Register identities
  */
-mozy.identities.set(Rect.identity,       Rect);
-mozy.identities.set(EdgeSizes.identity,  EdgeSizes);
-mozy.identities.set(Dimensions.identity, Dimensions);
+mozy.modelIdentities.set(Rect.identity,       Rect);
+mozy.modelIdentities.set(EdgeSizes.identity,  EdgeSizes);
+mozy.modelIdentities.set(Dimensions.identity, Dimensions);
 ```
+
 
 ## Using models
 
@@ -175,9 +158,34 @@ Or, if root constructor is unknown, using the registry:
 
 ```javascript
 const data = JSON.parse(jsonStr);
-const model = mozy.registry.getModel(data);
+const model = mozy.modelRegistry.getModel(data);
 console.log(model.padding.right) // 10
 ```
+
+
+## Test
+
+(WIP)
+
+```sh
+npm test
+```
+
+
+## Changelog
+
+### 0.2.0
+* Switched indentation from 4 spaces to 2.
+* Merged ModelRegistry and Registry into Registry.
+* Model:
+  - Rewrite (simplified).
+  - Now extends npm:wolfy87-eventemitter instead of npm:events.
+* Factory:
+  - Removed dependencies.
+* Tests
+  - More tests.
+  - Replaced istanbul coverage with nyc.
+
 
 ## License
 
