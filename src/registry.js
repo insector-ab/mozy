@@ -79,46 +79,23 @@ export default class Registry {
     return key;
   }
   /**
-   * Get existing registration, key and model.
-   * @param {Object} data JSON serializable object.
-   * @return {Array} Registration entry [key, value].
-   */
-  getEntryForData(data) {
-    // Key
-    const key = this.getValidKeyIn(data);
-    // If key is registered, return with model.
-    if (this.has(key)) {
-      return [key, this.get(key)];
-    }
-    // return without model
-    return [key, undefined];
-  }
-  /**
    * Get existing model in registry or create new.
    * @param {Object} data JSON serializable object.
    * @param {Function} Constructor Make new model of type Constructor.
    * @return {Model} New or registered model.
    */
   getModel(data, Constructor) {
-    let key, model;
-    // If data has valid key, get key and model (if registered)
-    if (this.dataHasValidKey(data)) {
-      [key, model] = this.getEntryForData(data);
+    // Key
+    const key = this.getValidKeyIn(data);
+    // If key is registered, return model.
+    if (this.has(key)) {
+      return this.get(key);
     }
-    // No model found, create new model and register
-    if (!model) {
-      // New model
-      if (Constructor) {
-        model = new Constructor(data);
-      } else {
-        model = this.newInstanceFor(data);
-      }
-      // Get key in data
-      key = this.getValidKeyIn(model.getModelData());
-      // Register
-      this.register(key, model);
-    }
-    // Return existing or new model
+    // Key not found, create new model
+    const model = Constructor ? new Constructor(data) : this.newInstanceFor(data);
+    // Register
+    this.register(model);
+    // Return new model
     return model;
   }
   /**
