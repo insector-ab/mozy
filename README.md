@@ -1,6 +1,7 @@
 # mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-69%25-yellow.svg)
 A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_initialization), factories and instance registries.
 
+
 ## Installation
 
 ```sh
@@ -88,6 +89,7 @@ mozy.modelIdentities.set(EdgeSizes.identity,  EdgeSizes);
 mozy.modelIdentities.set(Dimensions.identity, Dimensions);
 ```
 
+
 ## Using models
 
 ```javascript
@@ -160,6 +162,7 @@ const model = mozy.modelRegistry.getModel(data);
 console.log(model.padding.right) // 10
 ```
 
+
 ## Test
 
 (WIP)
@@ -167,17 +170,7 @@ console.log(model.padding.right) // 10
 ```sh
 npm test
 ```
-```
-|--------------|----------|----------|----------|----------|----------------|
-| File         |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
-|--------------|----------|----------|----------|----------|----------------|
-| All files    |    50.26 |    37.16 |    56.44 |    49.49 |                |
-|  factory.js  |    96.67 |    83.33 |      100 |      100 |        7,13,15 |
-|  index.js    |      100 |       75 |      100 |      100 |             20 |
-|  model.js    |    44.12 |    31.65 |       50 |    38.74 |... 402,438,439 |
-|  registry.js |    34.48 |    26.67 |    38.46 |    33.87 |... 433,436,446 |
-|--------------|----------|----------|----------|----------|----------------|
-```
+
 
 ## Changelog
 
@@ -192,6 +185,7 @@ npm test
 * Tests
   - More tests.
   - Replaced istanbul coverage with nyc.
+
 
 ## License
 
