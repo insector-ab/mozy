@@ -73,7 +73,7 @@ export class Dimensions extends mozy.Model {
       padding: {identity: EdgeSizes.identity},
       borderWidth: {identity: EdgeSizes.identity},
       margin: {identity: EdgeSizes.identity}
-    }
+    });
   }
 
 }
