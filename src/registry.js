@@ -85,11 +85,17 @@ export default class Registry {
    * @return {Model} New or registered model.
    */
   getModel(data, Constructor) {
-    // Key
-    const key = this.getValidKeyIn(data);
-    // If key is registered, return model.
-    if (this.has(key)) {
-      return this.get(key);
+    // Try registered model
+    try {
+      const key = this.getValidKeyIn(data);
+      // If key is registered, return model.
+      if (this.has(key)) {
+        return this.get(key);
+      }
+    } catch (e) {
+      if (!(e instanceof InvalidRegistryKeyError)) {
+        throw e;
+      }
     }
     // Key not found, create new model
     const model = Constructor ? new Constructor(data) : this.newInstanceFor(data);
