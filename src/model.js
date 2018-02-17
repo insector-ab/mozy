@@ -253,7 +253,7 @@ export default class Model extends EventEmitter {
   _getDefaults(...constructorArgs) {
     return {
       // Model polymorphic identity
-      identity: Model.identity,
+      identity: this.constructor.identity || Model.identity,
       // model uuid
       uuid: uuidV4()
     };
