@@ -7,6 +7,21 @@ import {Rect, EdgeSizes, Dimensions} from './layout';
 const should = chai.should();
 
 /**
+ * Helper class for test
+ */
+class CustomMap {
+  constructor(iterable) {
+    this._map = Object.create(null);
+    for (let [key, value] of iterable) {
+      this._map[key] = value;
+    }
+  }
+  get(key) {
+    return this._map[key];
+  }
+}
+
+/**
  * Factory tests
  */
 describe('Factory', () => {
@@ -263,18 +278,3 @@ describe('Factory', () => {
   });
 
 });
-
-/**
- * Helper class for test
- */
-class CustomMap {
-  constructor(iterable) {
-    this._map = Object.create(null);
-    for (let [key, value] of iterable) {
-      this._map[key] = value;
-    }
-  }
-  get(key) {
-    return this._map[key];
-  }
-}
