@@ -174,6 +174,11 @@ npm test
 
 ## Changelog
 
+### 0.2.1
+* Factory test fixes.
+* Default identity in _getDefaults
+* toJSON method for model
+
 ### 0.2.0
 * Switched indentation from 4 spaces to 2.
 * Merged ModelRegistry and Registry into Registry.
