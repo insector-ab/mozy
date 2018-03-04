@@ -40,6 +40,13 @@ export default class Model extends EventEmitter {
     return cloneDeep(this._data);
   }
   /**
+   * JSON.stringify() interface. Alias of getModelData.
+   * @return {Object} JSON serializable object.
+   */
+  toJSON() {
+    return this.getModelData();
+  }
+  /**
    * Underlying data object reference.
    * @return {Object} JSON serializable object.
    */
