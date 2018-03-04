@@ -101,7 +101,7 @@ dim.padding.right = 10;
 dim.borderWidth.top = 1;
 dim.borderWidth.bottom = 1;
 
-const jsonStr = JSON.stringify(dim.getModelData());
+const jsonStr = JSON.stringify(dim);
 console.log(jsonStr);
 ```
 
@@ -176,8 +176,8 @@ npm test
 
 ### 0.2.1
 * Factory test fixes.
-* Default identity in _getDefaults
-* toJSON method for model
+* Default identity in _getDefaults.
+* toJSON method for model.
 
 ### 0.2.0
 * Switched indentation from 4 spaces to 2.
