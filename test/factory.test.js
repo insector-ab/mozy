@@ -22,75 +22,59 @@ class CustomMap {
 }
 
 /**
- * Use case helper
- */
-function describeWithMap(map) {
-  // No constructor errors
-  it('should instantiate without error', function() {
-    const newFactory = function() { return new Factory(map); };
-    newFactory.should.not.throw(Error);
-  });
-  // New instance
-  it('should return new instance of existing identity', function() {
-    const factory = new Factory(map);
-    const dim = factory.newInstance(Dimensions.identity);
-    dim.should.be.an.instanceof(Dimensions);
-  });
-  // Non existing
-  it('should throw error for non-existing identity', function() {
-    const factory = new Factory(map);
-    const newInstance = function() { return factory.newInstance('non-existing-identity'); };
-    newInstance.should.throw(TypeError);
-  });
-}
-
-/**
  * Factory tests
  */
 describe('Factory', () => {
 
-  // Use cases
   describe('Use cases', () => {
 
-    // Object as map
-    describe('Using Object as map', () => {
-      const objMap = {
+    describe('New instance with map argument type:', () => {
+
+      // Describe helper
+      function describeWithMap(typeDescription, map) {
+        describe(typeDescription, () => {
+
+          it('should instantiate without error', function() {
+            const newFactory = function() { return new Factory(map); };
+            newFactory.should.not.throw(Error);
+          });
+
+          it('should return new instance of existing identity', function() {
+            const factory = new Factory(map);
+            const dim = factory.newInstance(Dimensions.identity);
+            dim.should.be.an.instanceof(Dimensions);
+          });
+
+          it('should throw error for non-existing identity', function() {
+            const factory = new Factory(map);
+            const newInstance = function() { return factory.newInstance('non-existing-identity'); };
+            newInstance.should.throw(TypeError);
+          });
+
+        });
+      }
+
+      const identityObj = {
         [Rect.identity]: Rect,
         [EdgeSizes.identity]: EdgeSizes,
         [Dimensions.identity]: Dimensions
       };
-      // Describe with map
-      describeWithMap(objMap);
+      const identityEntries = Object.entries(identityObj);
+
+      describeWithMap('object', identityObj);
+      describeWithMap('ES6 Map', new Map(identityEntries));
+      describeWithMap('object that has .get() method', new CustomMap(identityEntries));
+
     });
 
-    // Map as map
-    describe('Using ES6 Map', () => {
-      const es6Map = new Map([
-        [Rect.identity, Rect],
-        [EdgeSizes.identity, EdgeSizes],
-        [Dimensions.identity, Dimensions]
-      ]);
-      // Describe with map
-      describeWithMap(es6Map);
-    });
+    describe('New instance using an identityGetter', () => {
 
-    // Custom object with .get method
-    describe('Using object that implements .get() method', () => {
-      const customMap = new CustomMap([
-        [Rect.identity, Rect],
-        [EdgeSizes.identity, EdgeSizes],
-        [Dimensions.identity, Dimensions]
-      ]);
-      // Describe with map
-      describeWithMap(customMap);
-    });
-
-    describe('Using an identityGetter', () => {
       it('should return new instance of computed identity', function() {
         const factory = new Factory(modelIdentities, obj => 'mozy.' + obj.discriminator);
         const model = factory.newInstanceFor({discriminator: 'Model'});
         model.should.be.an.instanceof(Model);
       });
+
     });
 
   });
