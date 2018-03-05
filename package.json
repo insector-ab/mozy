@@ -1,6 +1,6 @@
 {
   "name": "mozy",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A model library using lazy initialization, factories and instance registries.",
   "main": "index.js",
   "dependencies": {
