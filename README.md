@@ -33,7 +33,7 @@ export class Rect extends mozy.Model {
       x: 0.0,
       y: 0.0,
       width: 0.0,
-      height: 0.0,
+      height: 0.0
     });
   }
 
@@ -173,6 +173,9 @@ npm test
 
 
 ## Changelog
+
+### 0.2.3
+* Flag to preserve uuids in Model.copy.
 
 ### 0.2.2
 * Factory test fixes.
