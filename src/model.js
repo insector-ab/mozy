@@ -174,21 +174,23 @@ export default class Model extends EventEmitter {
     return this;
   }
   /**
-   * Return a copy of this model, with new uuids.
+   * Return a copy of this model, with new uuids (default).
    * FIX: Better way to do this?
    * @return {Model} New instance of Model (or Model subclass).
    */
-  copy() {
+  copy({preserveUuids}) {
     // stringify data dict
-    const jsonStr = JSON.stringify(this._data);
+    let jsonStr = JSON.stringify(this.getModelData());
     // replace all uuids with new one's.
-    const uuidRegexp = /"uuid":"........-....-....-....-............"/g;
-    const newJsonStr = jsonStr.replace(uuidRegexp, () => {
-      return '"uuid":"' + uuidV4() + '"';
-    });
+    if (!preserveUuids) {
+      const uuidRegexp = /"uuid":"........-....-....-....-............"/g;
+      jsonStr = jsonStr.replace(uuidRegexp, () => {
+        return '"uuid":"' + uuidV4() + '"';
+      });
+    }
     // return instance of this
     const Constructor = this.constructor;
-    return new Constructor(JSON.parse(newJsonStr));
+    return new Constructor(JSON.parse(jsonStr));
   }
   /**
    * Interface for dispatching events.
