@@ -241,6 +241,10 @@ export default class Registry {
    * Dispose registry. Clear map and delete references.
    */
   dispose() {
+    // Already disposed?
+    if (!this.hasOwnProperty('_map')) {
+      return;
+    }
     // Clear registry
     this.clear();
     // delete refs
