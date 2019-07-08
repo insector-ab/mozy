@@ -1,4 +1,4 @@
-# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-69%25-yellow.svg)
+# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-65%25-yellow.svg)
 A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_initialization), factories and instance registries.
 
 
@@ -33,7 +33,7 @@ export class Rect extends mozy.Model {
       x: 0.0,
       y: 0.0,
       width: 0.0,
-      height: 0.0,
+      height: 0.0
     });
   }
 
@@ -173,6 +173,12 @@ npm test
 
 
 ## Changelog
+
+### 0.3.0
+* Issue #2: “Bug: copy replaces identical uuids with different uuids, destroying internal references”
+* Flag to preserve uuids in Model.copy.
+* Tests for Model.copy.
+* Dev env config and dependency updates (eslint, babel, nyc).
 
 ### 0.2.2
 * Factory test fixes.
