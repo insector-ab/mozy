@@ -1,8 +1,18 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
 import chai from 'chai';
-import {Model, Factory, modelIdentities} from '../index';
-import {Rect, EdgeSizes, Dimensions} from './layout';
+
+import {
+  Model,
+  Factory,
+  modelIdentities
+} from '../src/index';
+
+import {
+  Rect,
+  EdgeSizes,
+  Dimensions
+} from './layout';
 
 const should = chai.should();
 
@@ -71,7 +81,7 @@ describe('Factory', () => {
 
       it('should return new instance of computed identity', function() {
         const factory = new Factory(modelIdentities, obj => 'mozy.' + obj.discriminator);
-        const model = factory.newInstanceFor({discriminator: 'Model'});
+        const model = factory.newInstanceFor({ discriminator: 'Model' });
         model.should.be.an.instanceof(Model);
       });
 
@@ -148,7 +158,7 @@ describe('Factory', () => {
       });
 
       it('should return true if identity defined in object', function() {
-        factory.hasIdentityDefined({identity: 'unknown.identity'}).should.be.true;
+        factory.hasIdentityDefined({ identity: 'unknown.identity' }).should.be.true;
       });
 
       it('should return true for model data', function() {
@@ -218,7 +228,7 @@ describe('Factory', () => {
       });
 
       it('should return undefined for object with identity NOT present in factory\'s identity map', function() {
-        should.equal(factory.getConstructorFor({identity: 'an.unknown.identity'}), undefined);
+        should.equal(factory.getConstructorFor({ identity: 'an.unknown.identity' }), undefined);
       });
 
     });
@@ -234,7 +244,7 @@ describe('Factory', () => {
 
       it('should throw error for identity NOT present in factory\'s identity map', function() {
         const requireConstructorForObjectWithUnknownIdentity = function() {
-          factory.requireConstructorFor({identity: 'an.unknown.identity'});
+          factory.requireConstructorFor({ identity: 'an.unknown.identity' });
         };
         requireConstructorForObjectWithUnknownIdentity.should.throw(TypeError);
       });
@@ -263,12 +273,12 @@ describe('Factory', () => {
       const factory = new Factory(modelIdentities);
 
       it('should return an instance for object with identity present in factory\'s identity map', function() {
-        factory.newInstanceFor({identity: Model.identity}).should.be.an.instanceof(Model);
+        factory.newInstanceFor({ identity: Model.identity }).should.be.an.instanceof(Model);
       });
 
       it('should throw error for object with identity NOT present in factory\'s identity map', function() {
         const newInstanceOfUnknownIdentity = function() {
-          factory.newInstance({identity: 'an.unknown.identity'});
+          factory.newInstance({ identity: 'an.unknown.identity' });
         };
         newInstanceOfUnknownIdentity.should.throw(TypeError);
       });

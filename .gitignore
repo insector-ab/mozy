@@ -1,5 +1,9 @@
 node_modules
-/*.js
 .nyc_output
 *.sublime-*
+*.tgz
 
+/factory.js
+/index.js
+/model.js
+/registry.js
