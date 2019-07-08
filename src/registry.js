@@ -27,7 +27,7 @@ export default class Registry {
    * @param {Factory|Function} factory Model factory.
    * @param {Object} options See defaultOptions.
    */
-  constructor(factory, {map, ...options} = {}) {
+  constructor(factory, { map, ...options } = {}) {
     // Require valid factory
     if (!factory) {
       throw new TypeError('Argument factory required.');

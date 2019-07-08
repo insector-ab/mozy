@@ -1,21 +1,13 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
-import uuidV4 from 'uuid/v4';
 import chai from 'chai';
 
 import {
-  Model,
   Factory,
   Registry,
   modelIdentities,
   modelRegistry
-} from '../index';
-
-import {
-  Rect,
-  EdgeSizes,
-  Dimensions
-} from './layout';
+} from '../src/index';
 
 chai.should();
 

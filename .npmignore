@@ -1,7 +1,8 @@
+.eslint*
+.git*
+.nyc*
+babel.config.js
+*.sublime-*
 node_modules
 src
 test
-.babelrc
-.eslintrc
-.nyc_output
-*.sublime-*

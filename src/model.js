@@ -94,7 +94,7 @@ export default class Model extends EventEmitter {
    * @param {Object} flags.
    * @return {Model} The Model object.
    */
-  set(property, value, {setSilent, unsetIfFalsy} = {}) {
+  set(property, value, { setSilent, unsetIfFalsy } = {}) {
     // Previous value
     this._previousData[property] = this._data[property];
     // Unset if falsy
@@ -146,8 +146,8 @@ export default class Model extends EventEmitter {
   resetData(defaultData, flags = {}) {
     let data = {};
     // Keep uuid and identity
-    const {uuid, identity} = this._data;
-    Object.assign(data, {uuid, identity});
+    const { uuid, identity } = this._data;
+    Object.assign(data, { uuid, identity });
     // Update data with defaults
     data = Object.assign(this._withDefaultData(data), this._parseData(defaultData));
     // Clear _data
@@ -163,7 +163,7 @@ export default class Model extends EventEmitter {
    * @param {Object} flags.
    * @return {Model} The Model object.
    */
-  assignData(newData, {setSilent} = {}) {
+  assignData(newData, { setSilent } = {}) {
     // Assign new data
     Object.assign(this._data, newData);
     // Notify if not silent. Dispatch for each property?
@@ -178,15 +178,23 @@ export default class Model extends EventEmitter {
    * FIX: Better way to do this?
    * @return {Model} New instance of Model (or Model subclass).
    */
-  copy({preserveUuids}) {
+  copy({ preserveUuids } = {}) {
     // stringify data dict
     let jsonStr = JSON.stringify(this.getModelData());
     // replace all uuids with new one's.
     if (!preserveUuids) {
-      const uuidRegexp = /"uuid":"........-....-....-....-............"/g;
-      jsonStr = jsonStr.replace(uuidRegexp, () => {
-        return '"uuid":"' + uuidV4() + '"';
-      });
+      // Uuid V4 regexp
+      // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
+      const uuidRegexp = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}/ig;
+      // Create Uuid map
+      const uuidMap = jsonStr
+        .match(uuidRegexp)
+        .reduce((acc, uuid) => {
+          acc[uuid] = uuidV4();
+          return acc;
+        }, {});
+      // Replace current uuids with new one's
+      jsonStr = jsonStr.replace(uuidRegexp, (m, g1) => uuidMap[g1]);
     }
     // return instance of this
     const Constructor = this.constructor;
