@@ -242,7 +242,7 @@ export default class Registry {
    */
   dispose() {
     // Already disposed?
-    if (!this.hasOwnProperty('_map')) {
+    if (!Object.prototype.hasOwnProperty.call(this, '_map')) {
       return;
     }
     // Clear registry
@@ -284,7 +284,7 @@ Registry.get = function(name, ...constructorArgs) {
 export class InvalidRegistryKeyError extends ExtendableError {
 
   constructor(key, data) {
-    let lines = ['Invalid key "' + key + '" for getting instance from registry.'];
+    const lines = ['Invalid key "' + key + '" for getting instance from registry.'];
     if (data) {
       lines.push('Data: ' + JSON.stringify(data));
     }

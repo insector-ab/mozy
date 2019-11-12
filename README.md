@@ -174,6 +174,13 @@ npm test
 
 ## Changelog
 
+### 0.4.0
+* Bugfix for Issue #2: “Bug: copy replaces identical ...”
+* Removed flag to preserve uuids in Model.copy.
+* Fixed tests for Model.copy.
+* Dev dependency updates.
+* Lint fixes.
+
 ### 0.3.0
 * Issue #2: “Bug: copy replaces identical uuids with different uuids, destroying internal references”
 * Flag to preserve uuids in Model.copy.
