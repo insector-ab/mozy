@@ -24,6 +24,7 @@
     "no-unused-vars": ["error", { "args": "none", "ignoreRestSiblings": true}],
     "padded-blocks": "off",
     "semi": ["error", "always"],
-    "space-before-function-paren": "off"
+    "space-before-function-paren": "off",
+    "lines-between-class-members": "off"
   }
 }
