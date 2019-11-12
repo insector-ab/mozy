@@ -76,7 +76,7 @@ export default class Model extends EventEmitter {
    * @return {boolean} True if set.
    */
   has(property) {
-    return this._data.hasOwnProperty(property);
+    return Object.prototype.hasOwnProperty.call(this._data, property);
   }
   /**
    * Check if previous value of property is same
@@ -174,28 +174,32 @@ export default class Model extends EventEmitter {
     return this;
   }
   /**
-   * Return a copy of this model, with new uuids (default).
+   * Return a copy of this model, with new uuids.
    * FIX: Better way to do this?
    * @return {Model} New instance of Model (or Model subclass).
    */
-  copy({ preserveUuids } = {}) {
+  copy() {
     // stringify data dict
     let jsonStr = JSON.stringify(this.getModelData());
-    // replace all uuids with new one's.
-    if (!preserveUuids) {
-      // Uuid V4 regexp
-      // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
-      const uuidRegexp = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}/ig;
-      // Create Uuid map
-      const uuidMap = jsonStr
-        .match(uuidRegexp)
-        .reduce((acc, uuid) => {
+    // replace all "uuid" values with new one's.
+    const uuidAttrRegexp = /"uuid":".*?"/g;
+    // Uuid V4 regexp
+    // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
+    const uuidRegexp = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}/i;
+    // Create Uuid map
+    const uuidMap = (jsonStr.match(uuidAttrRegexp) || [])
+      .map(matchStr => matchStr.match(uuidRegexp)[0])
+      .reduce((acc, uuid) => {
+        if (!acc[uuid]) {
           acc[uuid] = uuidV4();
-          return acc;
-        }, {});
-      // Replace current uuids with new one's
-      jsonStr = jsonStr.replace(uuidRegexp, (m, g1) => uuidMap[g1]);
-    }
+        }
+        return acc;
+      }, {});
+    // Replace current uuids with new one's
+    jsonStr = Object.keys(uuidMap).reduce((acc, oldUuid) => {
+      acc = acc.replace(RegExp(oldUuid, 'g'), uuidMap[oldUuid]);
+      return acc;
+    }, jsonStr);
     // return instance of this
     const Constructor = this.constructor;
     return new Constructor(JSON.parse(jsonStr));

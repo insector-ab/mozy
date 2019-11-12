@@ -132,36 +132,29 @@ describe('Model', () => {
       // Model
       const model = new Model({
         dim1: dim1.getDataReference(),
-        dim2: dim2.getDataReference()
+        dim2: dim2.getDataReference(),
+        someUuidReference: uuidV4()
       });
       // Copy
-      let copiedModel = model.copy();
+      const copiedModel = model.copy();
       // New instances of Dimensions with copied data
-      let newDim1 = new Dimensions(copiedModel.get('dim1'));
-      let newDim2 = new Dimensions(copiedModel.get('dim2'));
+      const newDim1 = new Dimensions(copiedModel.get('dim1'));
+      const newDim2 = new Dimensions(copiedModel.get('dim2'));
 
       it('should properly copy model properties', function() {
         // Margin value should be the same
-        newDim1.margin.left.should.equal(newDim2.margin.left);
+        dim1.margin.left.should.equal(newDim1.margin.left);
         // Padding value should be the same
-        newDim1.padding.top.should.equal(newDim2.padding.top);
+        dim2.padding.top.should.equal(newDim2.padding.top);
       });
 
-      it('should properly replace uuids', function() {
+      it('should replace multiple instances of an uuid with the same new uuid', function() {
         // contentBox uuids should be the same
         newDim1.contentBox.uuid.should.equal(newDim2.contentBox.uuid);
       });
 
-      it('with { preserveUuids: true } should preserve uuids', function() {
-        // Copy
-        copiedModel = model.copy({ preserveUuids: true });
-        // New instances of Dimensions with copied data
-        newDim1 = new Dimensions(copiedModel.get('dim1'));
-        newDim2 = new Dimensions(copiedModel.get('dim2'));
-        // contentBox uuids should be the same
-        newDim1.contentBox.uuid.should.equal(newDim2.contentBox.uuid);
-        // dim1 contentBox uuid should be the same as copy dim1
-        dim1.contentBox.uuid.should.equal(newDim1.contentBox.uuid);
+      it('should preserve uuid references (key !== "uuid")', function() {
+        model.get('someUuidReference').should.equal(copiedModel.get('someUuidReference'));
       });
 
     });
