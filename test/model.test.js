@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
-import uuidV4 from 'uuid/v4';
+import { v4 as uuidV4 } from 'uuid';
 import chai from 'chai';
 import validate from 'uuid-validate';
 
@@ -34,12 +34,12 @@ describe('Model', () => {
       it('should create a Model instance', function() {
         // Model
         const model = new Model();
-        model.getModelData().should.satisfy(value => {
+        model.getDataReference().should.satisfy(value => {
           return value.identity === Model.identity &&
                  validate(value.uuid, 4);
         });
         // Model subclass
-        dimensions.getModelData().should.satisfy(value => {
+        dimensions.getDataReference().should.satisfy(value => {
           return value.identity === Dimensions.identity &&
                  validate(value.uuid, 4);
         });
@@ -49,13 +49,13 @@ describe('Model', () => {
         // Set model value
         dimensions.contentBox.width = 100;
         // dimensions data
-        const data = dimensions.getModelData();
+        const data = dimensions.getDeepClonedModelData();
         // New Dimensions instance
         const newDim = new Dimensions(data);
         // model getter
         newDim.contentBox.width.should.equal(100);
         // model data
-        newDim.getModelData().should.satisfy(value => {
+        newDim.getDataReference().should.satisfy(value => {
           return value.identity === Dimensions.identity &&
                  validate(value.uuid, 4) &&
                  value.contentBox.width === 100;
@@ -93,15 +93,15 @@ describe('Model', () => {
     });
 
     // Method: getModelData
-    describe('.getModelData()', () => {
+    describe('.getDeepClonedModelData()', () => {
 
       it('should be an object', function() {
-        (new Model()).getModelData().should.be.a('object');
-        dimensions.getModelData().should.be.a('object');
+        (new Model()).getDeepClonedModelData().should.be.a('object');
+        dimensions.getDeepClonedModelData().should.be.a('object');
       });
 
       it('should not be the underlying data reference', function() {
-        dimensions.getModelData().should.not.equal(dimensions.getDataReference());
+        dimensions.getDeepClonedModelData().should.not.equal(dimensions.getDataReference());
       });
 
     });

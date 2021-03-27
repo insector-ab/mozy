@@ -5,13 +5,9 @@ module.exports = function(api) {
     ['@babel/env']
   ];
 
-  const plugins = [
-    'istanbul'
-  ];
-
   return {
     presets,
-    plugins,
+    plugins: process.env.NYC_PROCESS_ID ? ['istanbul'] : [],
     comments: false
   };
 };

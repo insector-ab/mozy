@@ -1,6 +1,7 @@
 node_modules
 .nyc_output
 *.sublime-*
+*.code-workspace
 *.tgz
 
 /factory.js

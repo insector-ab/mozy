@@ -1,6 +1,6 @@
 import EventEmitter from 'wolfy87-eventemitter';
 import cloneDeep from 'lodash.clonedeep';
-import uuidV4 from 'uuid/v4';
+import { v4 as uuidV4 } from 'uuid';
 
 /**
  * Model
@@ -36,7 +36,7 @@ export default class Model extends EventEmitter {
    * Cloned underlying data object for model.
    * @return {Object} JSON serializable object.
    */
-  getModelData() {
+  getDeepClonedModelData() {
     return cloneDeep(this._data);
   }
   /**
@@ -44,7 +44,7 @@ export default class Model extends EventEmitter {
    * @return {Object} JSON serializable object.
    */
   toJSON() {
-    return this.getModelData();
+    return this.getDataReference();
   }
   /**
    * Underlying data object reference.
@@ -164,6 +164,10 @@ export default class Model extends EventEmitter {
    * @return {Model} The Model object.
    */
   assignData(newData, { setSilent } = {}) {
+    // Assign previous data
+    Object.keys(newData).forEach(property => {
+      this._previousData[property] = this._data[property];
+    });
     // Assign new data
     Object.assign(this._data, newData);
     // Notify if not silent. Dispatch for each property?
@@ -180,7 +184,7 @@ export default class Model extends EventEmitter {
    */
   copy() {
     // stringify data dict
-    let jsonStr = JSON.stringify(this.getModelData());
+    let jsonStr = JSON.stringify(this.getDataReference());
     // replace all "uuid" values with new one's.
     const uuidAttrRegexp = /"uuid":".*?"/g;
     // Uuid V4 regexp

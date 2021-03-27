@@ -174,6 +174,12 @@ npm test
 
 ## Changelog
 
+### 0.5.0
+* Renamed getModelData to getDeepClonedModelData for clarity.
+* Replaced usage of (previous) getModelData with getDataReference some places where deep cloning was unnecessary.
+* Added assigning of previous data in Model.assignData (issue #6).
+* Dependency updates.
+
 ### 0.4.0
 * Bugfix for Issue #2: “Bug: copy replaces identical ...”
 * Removed flag to preserve uuids in Model.copy.

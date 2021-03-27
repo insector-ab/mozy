@@ -116,8 +116,8 @@ describe('Factory', () => {
         should.equal(factory.getIdentityOf({}), undefined);
       });
 
-      it('should return Model.identity for (new Model()).getModelData()', function() {
-        factory.getIdentityOf(model.getModelData()).should.equal(Model.identity);
+      it('should return Model.identity for (new Model()).getDataReference()', function() {
+        factory.getIdentityOf(model.getDataReference()).should.equal(Model.identity);
       });
 
     });
@@ -137,8 +137,8 @@ describe('Factory', () => {
         requireIdentityOfEmptyObj.should.throw(TypeError);
       });
 
-      it('should return Model.identity for (new Model()).getModelData()', function() {
-        factory.requireIdentityOf(model.getModelData()).should.equal(Model.identity);
+      it('should return Model.identity for (new Model()).getDataReference()', function() {
+        factory.requireIdentityOf(model.getDataReference()).should.equal(Model.identity);
       });
 
     });
@@ -162,7 +162,7 @@ describe('Factory', () => {
       });
 
       it('should return true for model data', function() {
-        factory.hasIdentityDefined(model.getModelData()).should.be.true;
+        factory.hasIdentityDefined(model.getDataReference()).should.be.true;
       });
 
     });
@@ -224,7 +224,7 @@ describe('Factory', () => {
       const model = new Model();
 
       it('should return a function for object with identity present in factory\'s identity map', function() {
-        factory.getConstructorFor(model.getModelData()).should.be.a('function');
+        factory.getConstructorFor(model.getDataReference()).should.be.a('function');
       });
 
       it('should return undefined for object with identity NOT present in factory\'s identity map', function() {
@@ -239,7 +239,7 @@ describe('Factory', () => {
       const model = new Model();
 
       it('should return a function for object with identity present in factory\'s identity map', function() {
-        factory.requireConstructorFor(model.getModelData()).should.be.a('function');
+        factory.requireConstructorFor(model.getDataReference()).should.be.a('function');
       });
 
       it('should throw error for identity NOT present in factory\'s identity map', function() {

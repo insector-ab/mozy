@@ -133,10 +133,10 @@ export class Dimensions extends mozy.Model {
   _getDefaults() {
     return Object.assign(super._getDefaults(), {
       identity: Dimensions.identity,
-      contentBox: (new Rect()).getModelData(),
-      padding: (new EdgeSizes()).getModelData(),
-      borderWidth: (new EdgeSizes()).getModelData(),
-      margin: (new EdgeSizes()).getModelData()
+      contentBox: (new Rect()).getDeepClonedModelData(),
+      padding: (new EdgeSizes()).getDeepClonedModelData(),
+      borderWidth: (new EdgeSizes()).getDeepClonedModelData(),
+      margin: (new EdgeSizes()).getDeepClonedModelData()
     });
   }
 

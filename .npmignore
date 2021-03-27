@@ -3,6 +3,8 @@
 .nyc*
 babel.config.js
 *.sublime-*
+*.code-workspace
+*.tgz
 node_modules
 src
 test

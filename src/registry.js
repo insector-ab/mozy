@@ -129,7 +129,7 @@ export default class Registry {
    */
   register(model) {
     // Get valid key
-    const key = this.getValidKeyIn(model.getModelData());
+    const key = this.getValidKeyIn(model.getDataReference());
     // Set in map
     return this.set(key, model);
   }
@@ -140,7 +140,7 @@ export default class Registry {
    */
   unregister(model) {
     // Get valid key
-    const key = this.getValidKeyIn(model.getModelData());
+    const key = this.getValidKeyIn(model.getDataReference());
     // Delete in map
     return this.delete(key);
   }
