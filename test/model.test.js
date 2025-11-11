@@ -1,8 +1,7 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
-import { v4 as uuidV4 } from 'uuid';
+import { v4 as uuidV4, validate as uuidValidate, version as uuidVersion } from 'uuid';
 import chai from 'chai';
-import validate from 'uuid-validate';
 
 import { Model } from '../src/index';
 import {
@@ -11,6 +10,8 @@ import {
 } from './layout';
 
 chai.should();
+
+const isUuidV4 = value => uuidValidate(value) && uuidVersion(value) === 4;
 
 describe('Model', () => {
   let dimensions;
@@ -36,12 +37,12 @@ describe('Model', () => {
         const model = new Model();
         model.getDataReference().should.satisfy(value => {
           return value.identity === Model.identity &&
-                 validate(value.uuid, 4);
+                 isUuidV4(value.uuid);
         });
         // Model subclass
         dimensions.getDataReference().should.satisfy(value => {
           return value.identity === Dimensions.identity &&
-                 validate(value.uuid, 4);
+                 isUuidV4(value.uuid);
         });
       });
 
@@ -57,7 +58,7 @@ describe('Model', () => {
         // model data
         newDim.getDataReference().should.satisfy(value => {
           return value.identity === Dimensions.identity &&
-                 validate(value.uuid, 4) &&
+                 isUuidV4(value.uuid) &&
                  value.contentBox.width === 100;
         });
       });
@@ -72,7 +73,7 @@ describe('Model', () => {
       });
 
       it('should be UUID format version 4', function() {
-        validate(dimensions.uuid, 4).should.be.true;
+        isUuidV4(dimensions.uuid).should.be.true;
       });
 
       it('can\'t be set', function() {

@@ -8,3 +8,9 @@ node_modules
 /index.js
 /model.js
 /registry.js
+
+/agent.md
+/.mcp
+
+.in
+.env

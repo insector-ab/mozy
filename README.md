@@ -174,6 +174,10 @@ npm test
 
 ## Changelog
 
+### Unreleased
+* Replaced `wolfy87-eventemitter`, `lodash.clonedeep`, and `lodash.isplainobject` with maintained or native alternatives to shrink the runtime surface.
+* Upgraded to `uuid@13` and now rely on its built-in helpers for UUID generation and validation.
+
 ### 0.5.0
 * Renamed getModelData to getDeepClonedModelData for clarity.
 * Replaced usage of (previous) getModelData with getDataReference some places where deep cloning was unnecessary.

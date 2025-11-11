@@ -1,5 +1,4 @@
-import EventEmitter from 'wolfy87-eventemitter';
-import cloneDeep from 'lodash.clonedeep';
+import EventEmitter from 'eventemitter3';
 import { v4 as uuidV4 } from 'uuid';
 
 /**
@@ -37,7 +36,7 @@ export default class Model extends EventEmitter {
    * @return {Object} JSON serializable object.
    */
   getDeepClonedModelData() {
-    return cloneDeep(this._data);
+    return cloneData(this._data);
   }
   /**
    * JSON.stringify() interface. Alias of getModelData.
@@ -331,3 +330,25 @@ export const identities = new Map();
 
 // Register Model
 identities.set(Model.identity, Model);
+
+const hasStructuredClone = typeof globalThis !== 'undefined' && typeof globalThis.structuredClone === 'function';
+
+function cloneData(value) {
+  if (hasStructuredClone) {
+    return globalThis.structuredClone(value);
+  }
+  return cloneFallback(value);
+}
+
+function cloneFallback(value) {
+  if (Array.isArray(value)) {
+    return value.map(cloneFallback);
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).reduce((acc, key) => {
+      acc[key] = cloneFallback(value[key]);
+      return acc;
+    }, {});
+  }
+  return value;
+}
