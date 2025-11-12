@@ -150,7 +150,6 @@ mozy.modelIdentities.set(Dimensions.identity, Dimensions);
  * Assertion helpers.
  */
 function assertType(property, value, typeofValue) {
-  /* eslint-disable-next-line */
   if (typeof value !== typeofValue) {
     throw new TypeError(property + ' must be of type "' + typeofValue + '".');
   }
