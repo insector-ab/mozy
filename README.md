@@ -162,6 +162,50 @@ const model = mozy.modelRegistry.getModel(data);
 console.log(model.padding.right) // 10
 ```
 
+### Listening to changes
+
+Models extend EventEmitter, so you can subscribe to property-specific events or the generic `change` event:
+
+```javascript
+const rect = new Rect();
+
+rect.addEventListener('change width', (eventType, sender, newValue, oldValue) => {
+  console.log(`Width changed from ${oldValue} to ${newValue}`);
+});
+
+rect.addEventListener('change', () => {
+  console.log('Any property changed');
+});
+
+rect.toggle('selected');      // Convenience helper for booleans
+rect.unset('height');         // Removes the property entirely
+rect.resetData({ width: 10 }); // Resets while preserving identity/uuid
+rect.dispose();               // Removes listeners and references
+```
+
+### Advanced registry usage
+
+Registries support custom key extractors, override policies, and multitons:
+
+```javascript
+import mozy from 'mozy';
+
+const registry = new mozy.Registry(mozy.modelFactory, {
+  keyAttr: data => `custom-${data.uuid}`,
+  keyValidator: key => key.startsWith('custom-'),
+  allowOverrides: mozy.ALLOW_OVERRIDES
+});
+
+const rect = new Rect();
+registry.register(rect);
+
+// Shared registries without manual plumbing
+const shared = mozy.Registry.get('shared-rects', mozy.modelFactory);
+shared.register(rect);
+```
+
+`Registry.get(name, factory)` returns the same registry per name, making it easy to share caches or singletons between modules.
+
 
 ## Test
 
