@@ -86,12 +86,13 @@ export default class Registry {
    * @return {Model} New or registered model.
    */
   getModel(data, Constructor) {
+    let cachedKey;
     // Try registered model
     try {
-      const key = this.getValidKeyIn(data);
+      cachedKey = this.getValidKeyIn(data);
       // If key is registered, return model.
-      if (this.has(key)) {
-        return this.get(key);
+      if (this.has(cachedKey)) {
+        return this.get(cachedKey);
       }
     } catch (e) {
       if (!(e instanceof InvalidRegistryKeyError)) {
@@ -101,7 +102,7 @@ export default class Registry {
     // Key not found, create new model
     const model = Constructor ? new Constructor(data) : this.newInstanceFor(data);
     // Register
-    this.register(model);
+    this.register(model, cachedKey);
     // Return new model
     return model;
   }
@@ -128,22 +129,26 @@ export default class Registry {
    * @param {Model} model The model instance to register.
    * @return {Registry} The Registry object.
    */
-  register(model) {
+  register(model, key) {
     // Get valid key
-    const key = this.getValidKeyIn(model.getDataReference());
+    const resolvedKey = typeof key === 'undefined'
+      ? this.getValidKeyIn(model.getDataReference())
+      : key;
     // Set in map
-    return this.set(key, model);
+    return this.set(resolvedKey, model);
   }
   /**
    * Unregister model.
    * @param {Model} model The model instance to unregister.
    * @return {boolean} True if model found and deleted.
    */
-  unregister(model) {
+  unregister(model, key) {
     // Get valid key
-    const key = this.getValidKeyIn(model.getDataReference());
+    const resolvedKey = typeof key === 'undefined'
+      ? this.getValidKeyIn(model.getDataReference())
+      : key;
     // Delete in map
-    return this.delete(key);
+    return this.delete(resolvedKey);
   }
   /**
    * Validate key and value. If not valid throw error.

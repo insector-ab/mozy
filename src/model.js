@@ -164,14 +164,19 @@ export default class Model extends EventEmitter {
    * @return {Model} The Model object.
    */
   assignData(newData, { setSilent } = {}) {
+    let didChange = false;
     // Assign previous data
     Object.keys(newData).forEach(property => {
-      this._previousData[property] = this._data[property];
+      const previous = this._data[property];
+      this._previousData[property] = previous;
+      if (!didChange && newData[property] !== previous) {
+        didChange = true;
+      }
     });
     // Assign new data
     Object.assign(this._data, newData);
-    // Notify if not silent. Dispatch for each property?
-    if (!setSilent) {
+    // Notify if not silent and something changed.
+    if (!setSilent && didChange) {
       this.dispatchChange();
     }
     // Return

@@ -195,6 +195,7 @@ First-party typings live under `dist/types/index.d.ts` and are generated from th
 * Replaced `wolfy87-eventemitter`, `lodash.clonedeep`, and `lodash.isplainobject` with maintained or native alternatives to shrink the runtime surface.
 * Upgraded to `uuid@13` and now rely on its built-in helpers for UUID generation and validation.
 * Added TypeScript declaration output, CI + coverage automation, and broadened Factory/Registry tests to maintain >90% line coverage.
+* Skipped redundant change events and reused registry keys; local Node 22 microbenchmarks show `getModel` (~100k ops) in ~0.70s, `toggle` (~100k ops) in ~0.03s, and `resetData` (~10k ops) in ~0.007s.
 
 ### 0.5.0
 * Renamed getModelData to getDeepClonedModelData for clarity.
