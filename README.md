@@ -169,6 +169,8 @@ console.log(model.padding.right) // 10
 npm test
 ```
 
+The test script runs the Mocha suite through Babel and reports coverage via V8's built-in instrumentation (`c8`), emitting both text and lcov output.
+
 ## Build
 
 Compiled artifacts now live in `dist/`:

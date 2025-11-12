@@ -11,7 +11,6 @@ module.exports = function(api) {
 
   return {
     presets,
-    plugins: process.env.NYC_PROCESS_ID ? ['istanbul'] : [],
     comments: false
   };
 };
