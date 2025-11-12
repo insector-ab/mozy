@@ -1,7 +1,19 @@
-// @ts-nocheck
 import ExtendableError from 'es6-error';
 import Model from './model';
 import Factory from './factory';
+
+/**
+ * @typedef {import('./model').default} Model
+ * @typedef {import('./factory').default} RegistryFactory
+ * @typedef {Record<string, any>} ModelData
+ * @typedef {Map<string, Model>} ModelMap
+ * @typedef {{
+ *   keyAttr?: string | ((this: Registry, data: ModelData) => string),
+ *   allowOverrides?: boolean,
+ *   keyValidator?: (key: any) => boolean,
+ *   map?: ModelMap
+ * }} RegistryOptions
+ */
 
 /**
  * Constants
@@ -25,8 +37,8 @@ const defaultOptions = {
 export default class Registry {
   /**
    * Registry.constructor
-   * @param {Factory|Function} factory Model factory.
-   * @param {Object} options See defaultOptions.
+   * @param {RegistryFactory|((data: ModelData) => Model)} factory Model factory.
+   * @param {RegistryOptions} [options] See defaultOptions.
    */
   constructor(factory, { map, ...options } = {}) {
     // Require valid factory
@@ -55,15 +67,15 @@ export default class Registry {
   }
   /**
    * Registry options. See defaultOptions.
-   * @return {Object} Options object.
+   * @return {RegistryOptions} Options object.
    */
   get options() {
     return this._options;
   }
   /**
    * Get valid key from data object. Throw error if not valid.
-   * @param {Object} data JSON serializable object.
-   * @return {String} Key to register.
+   * @param {ModelData} data JSON serializable object.
+   * @return {string} Key to register.
    */
   getValidKeyIn(data) {
     // Require data
@@ -108,7 +120,7 @@ export default class Registry {
   }
   /**
    * Create new model instance using factory.
-   * @param {Object} data JSON serializable object.
+   * @param {ModelData} data JSON serializable object.
    * @return {Model} New Model instance.
    */
   newInstanceFor(data) {
@@ -153,7 +165,7 @@ export default class Registry {
   /**
    * Validate key and value. If not valid throw error.
    * @param {*} key The key to Validate.
-   * @param {*} value Tha value to validate.
+   * @param {Model} value The value to validate.
    * @return {Registry} The Registry object.
    */
   validate(key, value) {
@@ -185,7 +197,7 @@ export default class Registry {
   }
   /**
    * Check if data object has a valid key for registration.
-   * @param {Object} data JSON serializable object.
+   * @param {ModelData} data JSON serializable object.
    * @return {boolean} True if valid.
    */
   dataHasValidKey(data) {
@@ -271,6 +283,11 @@ export default class Registry {
 Registry._instances = new Map();
 
 // Multiton getter
+/**
+ * @param {string} name Registry name.
+ * @param {...any} constructorArgs Arguments passed to the Registry constructor.
+ * @return {Registry}
+ */
 Registry.get = function(name, ...constructorArgs) {
   // Instance exists?
   if (Registry._instances.has(name)) {

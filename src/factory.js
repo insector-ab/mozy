@@ -1,12 +1,18 @@
-// @ts-nocheck
+/**
+ * @typedef {import('./model').default} Model
+ * @typedef {Record<string, any>} ModelData
+ * @typedef {new (...args: any[]) => Model} ModelConstructor
+ * @typedef {Record<string, ModelConstructor> | Map<string, ModelConstructor>} ConstructorMap
+ * @typedef {string | ((obj: ModelData) => string|undefined)} IdentityGetter
+ */
 /**
  * Factory
  */
 export default class Factory {
   /**
    * Construct a new Factory instance.
-   * @param {Object|Map} constructorMap Identities mapped to constructors.
-   * @param {String|Function} identityGetter Name of identity attribute, or function for getting identity.
+   * @param {ConstructorMap} constructorMap Identities mapped to constructors.
+   * @param {IdentityGetter} [identityGetter] Name of identity attribute, or function for getting identity.
    */
   constructor(constructorMap, identityGetter) {
     // Require constructorMap
@@ -25,8 +31,8 @@ export default class Factory {
   }
   /**
    * Get the identity key of object, e.g. 'mozy.Model'.
-   * @param {Object} obj Object with polymorphic identity.
-   * @return {String}
+   * @param {ModelData} obj Object with polymorphic identity.
+   * @return {string|undefined}
    */
   getIdentityOf(obj) {
     if (!isPlainObject(obj)) {
@@ -36,8 +42,8 @@ export default class Factory {
   }
   /**
    * Same as getIdentityOf, but throws error if undefined.
-   * @param {Object} obj Object with polymorphic identity.
-   * @return {String}
+   * @param {ModelData} obj Object with polymorphic identity.
+   * @return {string}
    */
   requireIdentityOf(obj) {
     const identity = this.getIdentityOf(obj);
@@ -48,7 +54,7 @@ export default class Factory {
   }
   /**
    * Check if object has identity.
-   * @param {Object} obj Object with polymorphic identity.
+   * @param {ModelData} obj Object with polymorphic identity.
    * @return {boolean}
    */
   hasIdentityDefined(obj) {
@@ -56,7 +62,7 @@ export default class Factory {
   }
   /**
    * Check if identity present in factory identity map.
-   * @param {Object} obj Object with polymorphic identity.
+   * @param {string} identity Identity of constructor.
    * @return {boolean}
    */
   isKnownIdentity(identity) {
@@ -92,7 +98,7 @@ export default class Factory {
   }
   /**
    * Get Constructor registered for identity found in object.
-   * @param {Object} obj Object with polymorphic identity.
+   * @param {ModelData} obj Object with polymorphic identity.
    * @return {Function} Constructor
    */
   getConstructorFor(obj) {
@@ -100,7 +106,7 @@ export default class Factory {
   }
   /**
    * Require Constructor registered for identity found in object.
-   * @param {Object} obj Object with polymorphic identity.
+   * @param {ModelData} obj Object with polymorphic identity.
    * @return {Function} Constructor
    */
   requireConstructorFor(obj) {
@@ -108,9 +114,9 @@ export default class Factory {
   }
   /**
    * Get new instance of Constructor registered for identity.
-   * @param {String} identity Identity of constructor.
-   * @param {...} constructorArgs Arguments passed to Constructor.
-   * @return {Object} Instance of Constructor.
+   * @param {string} identity Identity of constructor.
+   * @param {...any} constructorArgs Arguments passed to Constructor.
+   * @return {Model} Instance of Constructor.
    */
   newInstance(identity, ...constructorArgs) {
     // Get constrcutor from identity
@@ -120,8 +126,8 @@ export default class Factory {
   }
   /**
    * Get new instance of Constructor registered for identity in object.
-   * @param {Object} obj Object with polymorphic identity.
-   * @return {Object} Instance of Constructor for identity.
+   * @param {ModelData} obj Object with polymorphic identity.
+   * @return {Model} Instance of Constructor for identity.
    */
   newInstanceFor(obj) {
     // Require identity in obj

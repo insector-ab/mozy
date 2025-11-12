@@ -1,6 +1,11 @@
-// @ts-nocheck
 import EventEmitter from 'eventemitter3';
 import { v4 as uuidV4 } from 'uuid';
+
+/**
+ * @typedef {Record<string, any>} ModelData
+ * @typedef {{ setSilent?: boolean, unsetIfFalsy?: boolean }} SetOptions
+ * @typedef {{ setSilent?: boolean }} AssignOptions
+ */
 
 /**
  * Model
@@ -8,8 +13,8 @@ import { v4 as uuidV4 } from 'uuid';
 export default class Model extends EventEmitter {
   /**
    * Model.constructor
-   * @param {Object} data JSON serializable object.
-   * @param {...} args Arguments passed to _getDefaults().
+   * @param {ModelData} [data] JSON serializable object.
+   * @param {...any} args Arguments passed to _getDefaults().
    */
   constructor(data = {}, ...args) {
     super();
@@ -20,7 +25,7 @@ export default class Model extends EventEmitter {
   }
   /**
    * Get uuid.
-   * @return {String}
+   * @return {string|undefined}
    */
   get uuid() {
     return this.get('uuid');
@@ -34,28 +39,28 @@ export default class Model extends EventEmitter {
   }
   /**
    * Cloned underlying data object for model.
-   * @return {Object} JSON serializable object.
+   * @return {ModelData} JSON serializable object.
    */
   getDeepClonedModelData() {
     return cloneData(this._data);
   }
   /**
    * JSON.stringify() interface. Alias of getModelData.
-   * @return {Object} JSON serializable object.
+   * @return {ModelData} JSON serializable object.
    */
   toJSON() {
     return this.getDataReference();
   }
   /**
    * Underlying data object reference.
-   * @return {Object} JSON serializable object.
+    * @return {ModelData} JSON serializable object.
    */
   getDataReference() {
     return this._data;
   }
   /**
    * Get value of data.property.
-   * @param {String} property Name of property.
+   * @param {string} property Name of property.
    * @param {*} defaultValue Default value to return if property is undefined.
    * @return {*}
    */
@@ -64,7 +69,7 @@ export default class Model extends EventEmitter {
   }
   /**
    * Return previous value of property.
-   * @param {String} property Name of property.
+   * @param {string} property Name of property.
    * @return {*}
    */
   getPrevious(property) {
@@ -72,7 +77,7 @@ export default class Model extends EventEmitter {
   }
   /**
    * Check if property is set in data.
-   * @param {String} property Name of property.
+   * @param {string} property Name of property.
    * @return {boolean} True if set.
    */
   has(property) {
@@ -81,7 +86,7 @@ export default class Model extends EventEmitter {
   /**
    * Check if previous value of property is same
    * as current.
-   * @param {list of strings} properties Names of properties.
+   * @param {...string} properties Names of properties.
    * @return {boolean} True if any of them has changed.
    */
   hasChanged(...properties) {
@@ -89,9 +94,9 @@ export default class Model extends EventEmitter {
   }
   /**
    * Set value of data.property.
-   * @param {String} property Name of property.
+   * @param {string} property Name of property.
    * @param {*} value Anything JSON serializable.
-   * @param {Object} flags.
+   * @param {SetOptions} [flags]
    * @return {Model} The Model object.
    */
   set(property, value, { setSilent, unsetIfFalsy } = {}) {
@@ -120,8 +125,8 @@ export default class Model extends EventEmitter {
   }
   /**
    * Toggle boolean property.
-   * @param {String} property Name of property.
-   * @param {Object} flags.
+   * @param {string} property Name of property.
+   * @param {SetOptions} [flags]
    * @return {Model} The Model object.
    */
   toggle(property, flags = {}) {
@@ -130,8 +135,8 @@ export default class Model extends EventEmitter {
   }
   /**
    * Unset value of data.property.
-   * @param {String} property Name of property.
-   * @param {Object} flags.
+   * @param {string} property Name of property.
+   * @param {SetOptions} [flags]
    * @return {Model} The Model object.
    */
   unset(property, flags = {}) {
@@ -139,8 +144,8 @@ export default class Model extends EventEmitter {
   }
   /**
    * Reset underlying data object for model.
-   * @param {Object} defaultData JSON serializable object.
-   * @param {Object} flags.
+   * @param {ModelData} defaultData JSON serializable object.
+   * @param {AssignOptions} [flags]
    * @return {Model} The Model object.
    */
   resetData(defaultData, flags = {}) {
@@ -159,8 +164,8 @@ export default class Model extends EventEmitter {
   }
   /**
    * Assign new data to underlying _data object.
-   * @param {Object} newData JSON serializable object.
-   * @param {Object} flags.
+   * @param {ModelData} newData JSON serializable object.
+   * @param {AssignOptions} [flags]
    * @return {Model} The Model object.
    */
   assignData(newData, { setSilent } = {}) {
@@ -216,8 +221,8 @@ export default class Model extends EventEmitter {
   /**
    * Interface for dispatching events.
    * Currently alias for EventEmitter.emit. May change.
-   * @param {String} eventType Event type key.
-   * @param {...} args Arguments passed to listeners.
+   * @param {string} eventType Event type key.
+   * @param {...any} args Arguments passed to listeners.
    * @return {Model} The Model object.
    */
   dispatchEvent(eventType, ...args) {
@@ -227,7 +232,7 @@ export default class Model extends EventEmitter {
   }
   /**
    * Dispatch change events.
-   * @param {String} property Name of property.
+   * @param {string} [property] Name of property.
    * @param {*} newValue Anything JSON serializable.
    * @param {*} oldValue Anything JSON serializable.
    * @return {Model} The Model object.
