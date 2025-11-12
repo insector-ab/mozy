@@ -5,6 +5,7 @@
   "type": "commonjs",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
+  "sideEffects": false,
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js",
@@ -46,13 +47,14 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir dist/cjs --copy-files",
-    "build:esm": "cross-env BABEL_ENV=esm babel src --out-dir dist/esm --copy-files",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir dist/cjs --copy-files --source-maps inline",
+    "build:esm": "cross-env BABEL_ENV=esm babel src --out-dir dist/esm --copy-files --source-maps inline",
     "build:types": "tsc --project tsconfig.types.json",
     "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
     "watch": "cross-env BABEL_ENV=cjs babel src --watch --out-dir dist/cjs --copy-files",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
+    "release": "npm run lint && npm test && npm run build",
     "test": "npm run test:coverage",
     "test:unit": "cross-env BABEL_ENV=cjs mocha -r @babel/register ./test/**/*.test.js",
     "test:coverage": "c8 --reporter=text --reporter=lcov npm run test:unit",

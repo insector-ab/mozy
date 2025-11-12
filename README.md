@@ -178,8 +178,11 @@ Compiled artifacts now live in `dist/`:
 - `npm run build` cleans the folder and emits both CommonJS (`dist/cjs`) and ESM (`dist/esm`) bundles via Babel.
 - `npm run watch` rebuilds the CommonJS bundle on change for local development.
 - Type declarations are generated via `npm run build:types` (also part of `npm run build`) and published under `dist/types`.
+- Source maps are emitted inline for both bundles to simplify downstream debugging.
 
 The package `exports` map points Node's `import` consumers at `dist/esm/index.js` and `require` callers at `dist/cjs/index.js`, so publishing only requires `npm publish` (the `prepare` script runs the build automatically).
+
+For local releases, run `npm run release` to execute lint, tests (with coverage), and the full build in a single command before publishing.
 
 ## TypeScript
 
