@@ -165,11 +165,18 @@ console.log(model.padding.right) // 10
 
 ## Test
 
-(WIP)
-
 ```sh
 npm test
 ```
+
+## Build
+
+Compiled artifacts now live in `dist/`:
+
+- `npm run build` cleans the folder and emits both CommonJS (`dist/cjs`) and ESM (`dist/esm`) bundles via Babel.
+- `npm run watch` rebuilds the CommonJS bundle on change for local development.
+
+The package `exports` map points Node's `import` consumers at `dist/esm/index.js` and `require` callers at `dist/cjs/index.js`, so publishing only requires `npm publish` (the `prepare` script runs the build automatically).
 
 
 ## Changelog

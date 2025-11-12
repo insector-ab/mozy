@@ -4,10 +4,7 @@ node_modules
 *.code-workspace
 *.tgz
 
-/factory.js
-/index.js
-/model.js
-/registry.js
+/dist
 
 /agent.md
 /.mcp
