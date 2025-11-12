@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "target": "es2020",
+    "moduleResolution": "node",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist/types",
+    "stripInternal": false
+  },
+  "include": ["types/index.ts"]
+}

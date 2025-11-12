@@ -169,7 +169,7 @@ console.log(model.padding.right) // 10
 npm test
 ```
 
-The test script runs the Mocha suite through Babel and reports coverage via V8's built-in instrumentation (`c8`), emitting both text and lcov output.
+The test script runs the Mocha suite through Babel and reports coverage via V8's built-in instrumentation (`c8`), emitting both text and lcov output. The suite targets >90% line coverage, including edge cases around the Registry and Factory helpers.
 
 ## Build
 
@@ -177,8 +177,13 @@ Compiled artifacts now live in `dist/`:
 
 - `npm run build` cleans the folder and emits both CommonJS (`dist/cjs`) and ESM (`dist/esm`) bundles via Babel.
 - `npm run watch` rebuilds the CommonJS bundle on change for local development.
+- Type declarations are generated via `npm run build:types` (also part of `npm run build`) and published under `dist/types`.
 
 The package `exports` map points Node's `import` consumers at `dist/esm/index.js` and `require` callers at `dist/cjs/index.js`, so publishing only requires `npm publish` (the `prepare` script runs the build automatically).
+
+## TypeScript
+
+First-party typings live under `dist/types/index.d.ts` and are generated from the hand-authored `types/` source via `npm run build:types`. Consumers can rely on the `types` field in `package.json` without installing community-maintained definitions.
 
 
 ## Changelog
@@ -186,6 +191,7 @@ The package `exports` map points Node's `import` consumers at `dist/esm/index.js
 ### Unreleased
 * Replaced `wolfy87-eventemitter`, `lodash.clonedeep`, and `lodash.isplainobject` with maintained or native alternatives to shrink the runtime surface.
 * Upgraded to `uuid@13` and now rely on its built-in helpers for UUID generation and validation.
+* Added TypeScript declaration output, CI + coverage automation, and broadened Factory/Registry tests to maintain >90% line coverage.
 
 ### 0.5.0
 * Renamed getModelData to getDeepClonedModelData for clarity.

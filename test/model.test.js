@@ -10,6 +10,7 @@ import {
 } from './layout';
 
 chai.should();
+const { expect } = chai;
 
 const isUuidV4 = value => uuidValidate(value) && uuidVersion(value) === 4;
 
@@ -158,6 +159,64 @@ describe('Model', () => {
         model.get('someUuidReference').should.equal(copiedModel.get('someUuidReference'));
       });
 
+    });
+
+  });
+
+  describe('Mutations and events', () => {
+
+    it('should emit change events when values mutate', function() {
+      const model = new Model();
+      let propertyEvents = 0;
+      let changeEvents = 0;
+      model.addEventListener('change value', (eventType, sender, newValue, oldValue) => {
+        eventType.should.equal('change value');
+        sender.should.equal(model);
+        newValue.should.equal(10);
+        expect(oldValue).to.be.undefined;
+        propertyEvents++;
+      });
+      model.addEventListener('change', () => { changeEvents++; });
+      model.set('value', 10);
+      propertyEvents.should.equal(1);
+      changeEvents.should.equal(1);
+      model.set('value', 20, { setSilent: true });
+      propertyEvents.should.equal(1);
+    });
+
+    it('should support toggle/unset helpers and track changes', function() {
+      const model = new Model();
+      model.toggle('flag').get('flag').should.equal(true);
+      model.toggle('flag').get('flag').should.equal(false);
+      model.set('token', 'value');
+      model.set('token', '', { unsetIfFalsy: true });
+      model.has('token').should.equal(false);
+      model.set('level', 1);
+      model.hasChanged('level').should.equal(true);
+      expect(model.getPrevious('level')).to.equal(undefined);
+      model.unset('level');
+      model.has('level').should.equal(false);
+    });
+
+    it('should assign and reset data while preserving uuid', function() {
+      const model = new Model();
+      model.assignData({ foo: 'bar' });
+      model.get('foo').should.equal('bar');
+      model.assignData({ baz: 1 }, { setSilent: true });
+      model.get('baz').should.equal(1);
+      const dim = new Dimensions();
+      dim.contentBox.width = 42;
+      const originalUuid = dim.uuid;
+      dim.resetData({ width: 10 });
+      dim.uuid.should.equal(originalUuid);
+      dim.get('width').should.equal(10);
+    });
+
+    it('should dispose models and remove references', function() {
+      const model = new Model();
+      model.dispose();
+      expect(model._data).to.be.undefined;
+      expect(model._previousData).to.be.undefined;
     });
 
   });
