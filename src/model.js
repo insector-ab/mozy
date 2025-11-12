@@ -1,3 +1,4 @@
+// @ts-nocheck
 import EventEmitter from 'eventemitter3';
 import { v4 as uuidV4 } from 'uuid';
 

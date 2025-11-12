@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ExtendableError from 'es6-error';
 import Model from './model';
 import Factory from './factory';

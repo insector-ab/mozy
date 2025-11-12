@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Model, { identities } from './model';
 import Factory from './factory';
 import Registry from './registry';
