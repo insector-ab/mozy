@@ -25,14 +25,14 @@ export default class Model extends EventEmitter {
   }
   /**
    * Get uuid.
-   * @return {string|undefined}
+   * @return {string}
    */
   get uuid() {
     return this.get('uuid');
   }
   /**
    * Underlying data object for model.
-   * @return {String} Model polymorphic identity.
+   * @return {string} Model polymorphic identity.
    */
   getModelIdentity() {
     return this.get('identity');
