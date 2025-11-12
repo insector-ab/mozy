@@ -19,8 +19,10 @@ export default class Model extends EventEmitter {
   constructor(data = {}, ...args) {
     super();
     // Set from parsed default data
+    /** @type {ModelData} */
     this._data = this._withDefaultData(this._parseData(data), ...args);
     // Store previous
+    /** @type {ModelData} */
     this._previousData = {};
   }
   /**
@@ -61,7 +63,7 @@ export default class Model extends EventEmitter {
   /**
    * Get value of data.property.
    * @param {string} property Name of property.
-   * @param {*} defaultValue Default value to return if property is undefined.
+   * @param {*} [defaultValue] Default value to return if property is undefined.
    * @return {*}
    */
   get(property, defaultValue) {
@@ -202,20 +204,23 @@ export default class Model extends EventEmitter {
     const uuidRegexp = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}/i;
     // Create Uuid map
     const uuidMap = (jsonStr.match(uuidAttrRegexp) || [])
-      .map(matchStr => matchStr.match(uuidRegexp)[0])
-      .reduce((acc, uuid) => {
-        if (!acc[uuid]) {
-          acc[uuid] = uuidV4();
+      .reduce((acc, matchStr) => {
+        const match = matchStr.match(uuidRegexp);
+        if (match) {
+          const current = match[0];
+          if (!acc[current]) {
+            acc[current] = uuidV4();
+          }
         }
         return acc;
-      }, {});
+      }, /** @type {Record<string, string>} */ ({}));
     // Replace current uuids with new one's
     jsonStr = Object.keys(uuidMap).reduce((acc, oldUuid) => {
       acc = acc.replace(RegExp(oldUuid, 'g'), uuidMap[oldUuid]);
       return acc;
     }, jsonStr);
     // return instance of this
-    const Constructor = this.constructor;
+    const Constructor = /** @type {new (data: ModelData) => Model} */ (this.constructor);
     return new Constructor(JSON.parse(jsonStr));
   }
   /**
@@ -233,8 +238,8 @@ export default class Model extends EventEmitter {
   /**
    * Dispatch change events.
    * @param {string} [property] Name of property.
-   * @param {*} newValue Anything JSON serializable.
-   * @param {*} oldValue Anything JSON serializable.
+   * @param {*} [newValue] Anything JSON serializable.
+   * @param {*} [oldValue] Anything JSON serializable.
    * @return {Model} The Model object.
    */
   dispatchChange(property, newValue, oldValue) {
@@ -245,6 +250,9 @@ export default class Model extends EventEmitter {
   }
   /**
    * Alias for EventEmitter.addListener
+   * @param {string} event
+   * @param {(eventType: string, sender: Model, ...args: any[]) => void} listener
+   * @return {Model}
    */
   addEventListener(event, listener) {
     this.addListener(event, listener);
@@ -253,6 +261,9 @@ export default class Model extends EventEmitter {
   }
   /**
    * Alias for EventEmitter.removeListener
+   * @param {string} event
+   * @param {(eventType: string, sender: Model, ...args: any[]) => void} listener
+   * @return {Model}
    */
   removeEventListener(event, listener) {
     this.removeListener(event, listener);
@@ -274,16 +285,16 @@ export default class Model extends EventEmitter {
   }
   /**
    * Parse data object for model.
-   * @param {...} data object for model.
-   * @return {Object} Default data (JSON serializable object) for Model.
+   * @param {ModelData} data object for model.
+   * @return {ModelData} Default data (JSON serializable object) for Model.
    */
   _parseData(data) {
     return data;
   }
   /**
    * Return default data object for new instance.
-   * @param {...} constructorArgs List of arguments passed in constructor.
-   * @return {Object} Default data (JSON serializable object) for Model.
+   * @param {...any} constructorArgs
+   * @return {ModelData}
    */
   _getDefaults(...constructorArgs) {
     return {
@@ -295,15 +306,15 @@ export default class Model extends EventEmitter {
   }
   /**
    * Assign defaults to data argument.
-   * @param {Object} defaultData JSON serializable object.
-   * @param {...} constructorArgs List of arguments passed in constructor.
-   * @return {Object} Default data (JSON serializable object) for Model.
+   * @param {ModelData} data JSON serializable object.
+   * @param {...any} constructorArgs
+   * @return {ModelData}
    */
   _withDefaultData(data, ...constructorArgs) {
     // Get defaults
     const defaults = Object.entries(this._getDefaults(...constructorArgs))
       .filter(entry => this._shouldSetDefaultValue(entry[0], data[entry[0]]))
-      .reduce((d, entry) => { d[entry[0]] = entry[1]; return d; }, {});
+      .reduce((d, entry) => { d[entry[0]] = entry[1]; return d; }, /** @type {ModelData} */ ({}));
     // Assign to data
     Object.keys(defaults).forEach(key => {
       data[key] = defaults[key];
@@ -326,8 +337,8 @@ export default class Model extends EventEmitter {
    * Delete references set on model.
    */
   _deleteReferences() {
-    delete this._data;
-    delete this._previousData;
+    this._data = /** @type {ModelData} */ (/** @type {unknown} */ (undefined));
+    this._previousData = /** @type {ModelData} */ (/** @type {unknown} */ (undefined));
   }
 
 }
@@ -344,6 +355,10 @@ identities.set(Model.identity, Model);
 
 const hasStructuredClone = typeof globalThis !== 'undefined' && typeof globalThis.structuredClone === 'function';
 
+/**
+ * @param {*} value
+ * @return {*}
+ */
 function cloneData(value) {
   if (hasStructuredClone) {
     return globalThis.structuredClone(value);
@@ -351,15 +366,20 @@ function cloneData(value) {
   return cloneFallback(value);
 }
 
+/**
+ * @param {*} value
+ * @return {*}
+ */
 function cloneFallback(value) {
   if (Array.isArray(value)) {
     return value.map(cloneFallback);
   }
   if (value && typeof value === 'object') {
-    return Object.keys(value).reduce((acc, key) => {
-      acc[key] = cloneFallback(value[key]);
+    const obj = /** @type {Record<string, any>} */ (value);
+    return Object.keys(obj).reduce((acc, key) => {
+      acc[key] = cloneFallback(obj[key]);
       return acc;
-    }, {});
+    }, /** @type {Record<string, any>} */ ({}));
   }
   return value;
 }

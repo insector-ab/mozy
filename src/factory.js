@@ -3,7 +3,8 @@
  * @typedef {Record<string, any>} ModelData
  * @typedef {new (...args: any[]) => Model} ModelConstructor
  * @typedef {Record<string, ModelConstructor> | Map<string, ModelConstructor>} ConstructorMap
- * @typedef {string | ((obj: ModelData) => string|undefined)} IdentityGetter
+ * @typedef {(obj: ModelData) => string|undefined} IdentityGetterFunction
+ * @typedef {string | IdentityGetterFunction} IdentityGetter
  */
 /**
  * Factory
@@ -20,14 +21,19 @@ export default class Factory {
       throw new TypeError('constructorMap required.');
     }
     // Map for Constructors
+    /**
+     * @private
+     * @type {ConstructorMap}
+     */
     this._constructorMap = constructorMap;
     // identityGetter is function?
-    if (isFunction(identityGetter)) {
-      this._identityGetter = identityGetter;
-    // Assume undefined or string
-    } else {
-      this._identityGetter = getDefaultIdentityGetter(identityGetter || 'identity');
-    }
+    /**
+     * @private
+     * @type {IdentityGetterFunction}
+     */
+    this._identityGetter = isFunction(identityGetter)
+      ? /** @type {IdentityGetterFunction} */ (identityGetter)
+      : getDefaultIdentityGetter(typeof identityGetter === 'string' ? identityGetter : 'identity');
   }
   /**
    * Get the identity key of object, e.g. 'mozy.Model'.
@@ -50,7 +56,7 @@ export default class Factory {
     if (isUndefined(identity)) {
       throw new TypeError('Undefined identity in object.');
     }
-    return identity;
+    return /** @type {string} */ (identity);
   }
   /**
    * Check if object has identity.
@@ -71,21 +77,25 @@ export default class Factory {
   /**
    * Get Constructor registered for identity.
    * @param {String} identity Identity of constructor.
-   * @return {Function} Constructor
+   * @return {ModelConstructor} Constructor
    */
   getConstructor(identity) {
     // Get constructor from identity
-    let Constructor = this._constructorMap[identity];
-    // If undefined, try with .get method
-    if (!Constructor && isFunction(this._constructorMap.get)) {
-      Constructor = this._constructorMap.get(identity);
+    if (this._constructorMap instanceof Map) {
+      return /** @type {ModelConstructor} */ (this._constructorMap.get(identity));
     }
-    return Constructor;
+    if (hasGetMethod(this._constructorMap)) {
+      const value = this._constructorMap.get(identity);
+      if (value) {
+        return value;
+      }
+    }
+    return this._constructorMap[identity];
   }
   /**
    * Get Constructor registered for identity. Throw error if not found.
    * @param {String} identity Identity of constructor.
-   * @return {Function} Constructor
+   * @return {ModelConstructor} Constructor
    */
   requireConstructor(identity) {
     // Get constructor from identity
@@ -94,7 +104,7 @@ export default class Factory {
     if (!Constructor) {
       throw new TypeError('Constructor for identity "' + identity + '" not found. Not registered?');
     }
-    return Constructor;
+    return /** @type {ModelConstructor} */ (Constructor);
   }
   /**
    * Get Constructor registered for identity found in object.
@@ -140,8 +150,8 @@ export default class Factory {
 
 /**
  * Helper for getIdentityOf
- * @param {String} attr Name of attribute for getting identity in object.
- * @return {Function} Function for getting identity.
+ * @param {string} attr Name of attribute for getting identity in object.
+ * @return {IdentityGetterFunction} Function for getting identity.
  */
 function getDefaultIdentityGetter(attr) {
   return function(obj) {
@@ -165,6 +175,20 @@ function isFunction(value) {
   return typeof value === 'function';
 }
 
+/**
+ * Check if value has get method
+ * @param {ConstructorMap} value
+ * @return {value is { get: (identity: string) => ModelConstructor | undefined}}
+ */
+function hasGetMethod(value) {
+  return Boolean(value && typeof /** @type {any} */ (value).get === 'function' && !(value instanceof Map));
+}
+
+/**
+ * Check if value is a plain object
+ * @param {*} value
+ * @returns {Boolean}
+ */
 function isPlainObject(value) {
   if (!value || typeof value !== 'object') {
     return false;

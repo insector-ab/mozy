@@ -3,14 +3,15 @@ import Model from './model';
 import Factory from './factory';
 
 /**
- * @typedef {import('./model').default} Model
- * @typedef {import('./factory').default} RegistryFactory
  * @typedef {Record<string, any>} ModelData
  * @typedef {Map<string, Model>} ModelMap
+ * @typedef {new (...args: any[]) => Model} ModelConstructor
+ * @typedef {(data: ModelData) => Model} FactoryFunction
+ * @typedef {Factory | FactoryFunction} RegistryFactory
  * @typedef {{
- *   keyAttr?: string | ((this: Registry, data: ModelData) => string),
- *   allowOverrides?: boolean,
- *   keyValidator?: (key: any) => boolean,
+ *   keyAttr: string | ((this: Registry, data: ModelData) => string),
+ *   allowOverrides: boolean,
+ *   keyValidator: (key: any) => boolean,
  *   map?: ModelMap
  * }} RegistryOptions
  */
@@ -23,24 +24,25 @@ export const DONT_ALLOW_OVERRIDES = false;
 /**
  * Default options
  */
-const defaultOptions = {
+const defaultOptions = /** @type {RegistryOptions} */ ({
   // The attribute from which to get the registry key for models. E.g. "id", uuid" ..
   keyAttr: 'uuid',
   // Allow/disallow overriding of keys in registry.
   allowOverrides: DONT_ALLOW_OVERRIDES,
   // Function for validating keys
-  keyValidator: key => typeof key === 'string'
-};
+  keyValidator: /** @type {(key: any) => boolean} */ (key => typeof key === 'string')
+});
 /**
  * Registry
  */
 export default class Registry {
   /**
    * Registry.constructor
-   * @param {RegistryFactory|((data: ModelData) => Model)} factory Model factory.
+   * @param {RegistryFactory} factory Model factory.
    * @param {RegistryOptions} [options] See defaultOptions.
    */
-  constructor(factory, { map, ...options } = {}) {
+  constructor(factory, options) {
+    const { map, ...restOptions } = Object.assign({}, defaultOptions, options);
     // Require valid factory
     if (!factory) {
       throw new TypeError('Argument factory required.');
@@ -48,17 +50,24 @@ export default class Registry {
     // Factory for creating instances.
     this.factory = factory;
     // Map to use for registration
+    /** @type {ModelMap} */
     this._map = map || new Map();
     // Options
-    this._options = Object.assign({}, defaultOptions, options);
+    this._options = restOptions;
   }
   /**
    * Model factory.
-   * @return {Factory|Function} Instance of Factory, or factory function
+   * @return {RegistryFactory} Instance of Factory, or factory function
    */
   get factory() {
+    if (!this._factory) {
+      throw new TypeError('Registry factory not initialized.');
+    }
     return this._factory;
   }
+  /**
+   * @param {RegistryFactory} value
+   */
   set factory(value) {
     if (!isValidFactory(value)) {
       throw new TypeError('Argument factory must be function or instance of mozy.Factory.');
@@ -93,8 +102,8 @@ export default class Registry {
   }
   /**
    * Get existing model in registry or create new.
-   * @param {Object} data JSON serializable object.
-   * @param {Function} Constructor Make new model of type Constructor.
+   * @param {ModelData} data JSON serializable object.
+   * @param {ModelConstructor} [Constructor] Make new model of type Constructor.
    * @return {Model} New or registered model.
    */
   getModel(data, Constructor) {
@@ -104,7 +113,7 @@ export default class Registry {
       cachedKey = this.getValidKeyIn(data);
       // If key is registered, return model.
       if (this.has(cachedKey)) {
-        return this.get(cachedKey);
+        return /** @type {Model} */ (this.get(cachedKey));
       }
     } catch (e) {
       if (!(e instanceof InvalidRegistryKeyError)) {
@@ -129,8 +138,8 @@ export default class Registry {
       return this.factory.newInstanceFor(data);
     }
     // If Function
-    if (isFunction(this.factory)) {
-      const factoryFunction = this.factory;
+    if (typeof this.factory === 'function') {
+      const factoryFunction = /** @type {FactoryFunction} */ (this.factory);
       return factoryFunction.call(this, data);
     }
     // No factory and no Constructor argument.
@@ -139,6 +148,7 @@ export default class Registry {
   /**
    * Register model.
    * @param {Model} model The model instance to register.
+   * @param {string} [key]
    * @return {Registry} The Registry object.
    */
   register(model, key) {
@@ -152,6 +162,7 @@ export default class Registry {
   /**
    * Unregister model.
    * @param {Model} model The model instance to unregister.
+   * @param {string} [key]
    * @return {boolean} True if model found and deleted.
    */
   unregister(model, key) {
@@ -213,16 +224,16 @@ export default class Registry {
   }
   /**
    * Map.get API
-   * @param {*} key The key of the element to return from the Registry.
-   * @return {*} The element associated with the specified key or undefined if the key can't be found in the Map object.
+   * @param {string} key The key of the element to return from the Registry.
+   * @return {Model|undefined} The element associated with the specified key or undefined if the key can't be found in the Map object.
    */
   get(key) {
     return this._map.get(key);
   }
   /**
    * Map.set API
-   * @param {*} key The key of the element to add to the Registry.
-   * @param {*} value The value of the element to add to the Registry.
+   * @param {string} key The key of the element to add to the Registry.
+   * @param {Model} value The value of the element to add to the Registry.
    * @return {Registry} The Registry object.
    */
   set(key, value) {
@@ -235,7 +246,7 @@ export default class Registry {
   }
   /**
    * Map.has API
-   * @param {*} key The key of the element to test for presence in the Registry.
+   * @param {string} key The key of the element to test for presence in the Registry.
    * @return {boolean} True if exists.
    */
   has(key) {
@@ -243,7 +254,7 @@ export default class Registry {
   }
   /**
    * Map.delete API
-   * @param {*} key The key of the element to delete from the Registry.
+   * @param {string} key The key of the element to delete from the Registry.
    * @return {boolean} True if key found and deleted.
    */
   delete(key) {
@@ -272,29 +283,31 @@ export default class Registry {
    * Delete references on instance.
    */
   _deleteReferences() {
-    delete this._factory;
-    delete this._map;
-    delete this._options;
+    this._factory = /** @type {RegistryFactory} */ (/** @type {unknown} */ (undefined));
+    this._map = /** @type {ModelMap} */ (/** @type {unknown} */ (undefined));
+    this._options = /** @type {RegistryOptions} */ (/** @type {unknown} */ (undefined));
   }
 
 }
 
 // Store multitons
+/** @type {Map<string, Registry>} */
 Registry._instances = new Map();
 
 // Multiton getter
 /**
  * @param {string} name Registry name.
- * @param {...any} constructorArgs Arguments passed to the Registry constructor.
+ * @param {RegistryFactory} factory
+ * @param {RegistryOptions} [options]
  * @return {Registry}
  */
-Registry.get = function(name, ...constructorArgs) {
+Registry.get = function(name, factory, options) {
   // Instance exists?
   if (Registry._instances.has(name)) {
-    return Registry._instances.get(name);
+    return /** @type {Registry} */ (Registry._instances.get(name));
   }
   // Create new Registry
-  const reg = new Registry(...constructorArgs);
+  const reg = new Registry(factory, options);
   // Register
   Registry._instances.set(name, reg);
   // return
@@ -306,6 +319,10 @@ Registry.get = function(name, ...constructorArgs) {
  */
 export class InvalidRegistryKeyError extends ExtendableError {
 
+  /**
+   * @param {string|undefined} key
+   * @param {ModelData} [data]
+   */
   constructor(key, data) {
     const lines = ['Invalid key "' + key + '" for getting instance from registry.'];
     if (data) {
@@ -318,22 +335,16 @@ export class InvalidRegistryKeyError extends ExtendableError {
 
 /**
  * Check if value is valid factory type
- * @param  {*} value Value to check
- * @return {Boolean} True if valie
+ * @param {*} value
+ * @return {value is RegistryFactory}
  */
 function isValidFactory(value) {
-  if (!value) {
-    return false;
-  }
-  if (!(isFunction(value) || value instanceof Factory)) {
-    return false;
-  }
-  return true;
+  return Boolean(value) && (value instanceof Factory || typeof value === 'function');
 }
 /**
  * Check if value is undefined
  * @param  {*} value
- * @return {Boolean} True if undefined
+ * @return {value is undefined}
  */
 function isUndefined(value) {
   return typeof value === 'undefined';
@@ -341,7 +352,7 @@ function isUndefined(value) {
 /**
  * Check if value is function
  * @param  {*} value
- * @return {Boolean} True if undefined
+ * @return {value is Function}
  */
 function isFunction(value) {
   return typeof value === 'function';

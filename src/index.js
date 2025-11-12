@@ -1,5 +1,5 @@
 /**
- * @typedef {import('./model').default} ModelClass
+ * @typedef {new (...args: any[]) => Model} ModelConstructor
  * @typedef {import('./factory').default} FactoryClass
  * @typedef {import('./registry').default} RegistryClass
  */
@@ -14,7 +14,7 @@ export { Factory };
 export { Registry };
 /**
  * Model identities
- * @type {Map<string, ModelClass>}
+ * @type {Map<string, ModelConstructor>}
  */
 export const modelIdentities = identities;
 /**
