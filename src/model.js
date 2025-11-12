@@ -1,6 +1,10 @@
 import EventEmitter from 'eventemitter3';
 import { v4 as uuidV4 } from 'uuid';
 
+const UUID_ATTR_REGEXP = /"uuid":".*?"/g;
+// https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
+const UUID_V4_REGEXP = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}/i;
+
 /**
  * @typedef {Record<string, any>} ModelData
  * @typedef {{ setSilent?: boolean, unsetIfFalsy?: boolean }} SetOptions
@@ -197,28 +201,19 @@ export default class Model extends EventEmitter {
   copy() {
     // stringify data dict
     let jsonStr = JSON.stringify(this.getDataReference());
-    // replace all "uuid" values with new one's.
-    const uuidAttrRegexp = /"uuid":".*?"/g;
-    // Uuid V4 regexp
-    // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
-    const uuidRegexp = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}/i;
     // Create Uuid map
-    const uuidMap = (jsonStr.match(uuidAttrRegexp) || [])
-      .reduce((acc, matchStr) => {
-        const match = matchStr.match(uuidRegexp);
-        if (match) {
-          const current = match[0];
-          if (!acc[current]) {
-            acc[current] = uuidV4();
-          }
+    const uuidMap = (jsonStr.match(UUID_ATTR_REGEXP) || []).reduce((acc, matchStr) => {
+      const match = matchStr.match(UUID_V4_REGEXP);
+      if (match) {
+        const current = match[0];
+        if (!acc[current]) {
+          acc[current] = uuidV4();
         }
-        return acc;
-      }, /** @type {Record<string, string>} */ ({}));
-    // Replace current uuids with new one's
-    jsonStr = Object.keys(uuidMap).reduce((acc, oldUuid) => {
-      acc = acc.replace(RegExp(oldUuid, 'g'), uuidMap[oldUuid]);
+      }
       return acc;
-    }, jsonStr);
+    }, /** @type {Record<string, string>} */ ({}));
+    // Replace current uuids with new one's
+    jsonStr = Object.keys(uuidMap).reduce((acc, oldUuid) => acc.split(oldUuid).join(uuidMap[oldUuid]), jsonStr);
     // return instance of this
     const Constructor = /** @type {new (data: ModelData) => Model} */ (this.constructor);
     return new Constructor(JSON.parse(jsonStr));
@@ -312,13 +307,15 @@ export default class Model extends EventEmitter {
    */
   _withDefaultData(data, ...constructorArgs) {
     // Get defaults
-    const defaults = Object.entries(this._getDefaults(...constructorArgs))
-      .filter(entry => this._shouldSetDefaultValue(entry[0], data[entry[0]]))
-      .reduce((d, entry) => { d[entry[0]] = entry[1]; return d; }, /** @type {ModelData} */ ({}));
-    // Assign to data
-    Object.keys(defaults).forEach(key => {
-      data[key] = defaults[key];
-    });
+    const defaults = this._getDefaults(...constructorArgs);
+    for (const key in defaults) {
+      if (!Object.prototype.hasOwnProperty.call(defaults, key)) {
+        continue;
+      }
+      if (this._shouldSetDefaultValue(key, data[key])) {
+        data[key] = defaults[key];
+      }
+    }
     // Return
     return data;
   }
@@ -354,14 +351,15 @@ export const identities = new Map();
 identities.set(Model.identity, Model);
 
 const hasStructuredClone = typeof globalThis !== 'undefined' && typeof globalThis.structuredClone === 'function';
+const structuredCloneFn = hasStructuredClone ? globalThis.structuredClone : undefined;
 
 /**
  * @param {*} value
  * @return {*}
  */
 function cloneData(value) {
-  if (hasStructuredClone) {
-    return globalThis.structuredClone(value);
+  if (structuredCloneFn) {
+    return structuredCloneFn(value);
   }
   return cloneFallback(value);
 }
@@ -372,14 +370,17 @@ function cloneData(value) {
  */
 function cloneFallback(value) {
   if (Array.isArray(value)) {
-    return value.map(cloneFallback);
+    return Array.from(value, cloneFallback);
   }
   if (value && typeof value === 'object') {
     const obj = /** @type {Record<string, any>} */ (value);
-    return Object.keys(obj).reduce((acc, key) => {
-      acc[key] = cloneFallback(obj[key]);
-      return acc;
-    }, /** @type {Record<string, any>} */ ({}));
+    const clone = /** @type {Record<string, any>} */ ({});
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        clone[key] = cloneFallback(obj[key]);
+      }
+    }
+    return clone;
   }
   return value;
 }

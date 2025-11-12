@@ -42,7 +42,7 @@ export default class Registry {
    * @param {RegistryOptions} [options] See defaultOptions.
    */
   constructor(factory, options) {
-    const { map, ...restOptions } = Object.assign({}, defaultOptions, options);
+    const { map, ...restOptions } = Object.assign({}, defaultOptions, (options || {}));
     // Require valid factory
     if (!factory) {
       throw new TypeError('Argument factory required.');
@@ -54,6 +54,11 @@ export default class Registry {
     this._map = map || new Map();
     // Options
     this._options = restOptions;
+    /**
+     * @private
+     * @type {(data: ModelData) => string}
+     */
+    this._keyGetter = this._createKeyGetter(this._options.keyAttr);
   }
   /**
    * Model factory.
@@ -91,8 +96,7 @@ export default class Registry {
     if (isUndefined(data)) {
       throw new TypeError('Argument data required.');
     }
-    const keyAttr = this.options.keyAttr;
-    const key = isFunction(keyAttr) ? keyAttr.call(this, data) : data[keyAttr];
+    const key = this._keyGetter(data);
     // Require valid
     if (!this.isValidKey(key)) {
       throw new InvalidRegistryKeyError(key, data);
@@ -280,12 +284,24 @@ export default class Registry {
     this._deleteReferences();
   }
   /**
+   * @private
+   * @param {RegistryOptions['keyAttr']} attr
+   * @return {(data: ModelData) => string}
+   */
+  _createKeyGetter(attr) {
+    if (isFunction(attr)) {
+      return data => /** @type {string} */ (attr.call(this, data));
+    }
+    return data => /** @type {string} */ (data[attr]);
+  }
+  /**
    * Delete references on instance.
    */
   _deleteReferences() {
     this._factory = /** @type {RegistryFactory} */ (/** @type {unknown} */ (undefined));
     this._map = /** @type {ModelMap} */ (/** @type {unknown} */ (undefined));
     this._options = /** @type {RegistryOptions} */ (/** @type {unknown} */ (undefined));
+    this._keyGetter = /** @type {(data: ModelData) => string} */ (/** @type {unknown} */ (undefined));
   }
 
 }
