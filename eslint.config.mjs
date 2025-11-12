@@ -1,9 +1,9 @@
-const js = require('@eslint/js');
-const globals = require('globals');
-const importPlugin = require('eslint-plugin-import');
-const mochaPlugin = require('eslint-plugin-mocha');
-const nPlugin = require('eslint-plugin-n');
-const promisePlugin = require('eslint-plugin-promise');
+import js from '@eslint/js';
+import globals from 'globals';
+import importPlugin from 'eslint-plugin-import';
+import mochaPlugin from 'eslint-plugin-mocha';
+import nPlugin from 'eslint-plugin-n';
+import promisePlugin from 'eslint-plugin-promise';
 
 const importRules = importPlugin.default ?? importPlugin;
 const mochaRules = mochaPlugin.default ?? mochaPlugin;
@@ -17,7 +17,7 @@ const sharedGlobals = {
   SharedArrayBuffer: 'readonly'
 };
 
-module.exports = [
+export default [
   js.configs.recommended,
   {
     files: ['src/**/*.js', 'test/**/*.js'],
