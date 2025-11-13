@@ -239,6 +239,8 @@ First-party typings live under `dist/types/index.d.ts` and are generated from th
 * Replaced `wolfy87-eventemitter`, `lodash.clonedeep`, and `lodash.isplainobject` with maintained or native alternatives to shrink the runtime surface.
 * Upgraded to `uuid@13` and now rely on its built-in helpers for UUID generation and validation.
 * Added TypeScript declaration output, CI + coverage automation, and broadened Factory/Registry tests to maintain >90% line coverage.
+* Dropped all `@ts-nocheck` directives and annotated `Model`, `Factory`, `Registry`, and the entrypoint with full JSDoc types so editors catch missing uuid/identity fields and event signatures out of the box.
+* Hoisted UUID regexes, removed `Object.keys().forEach` allocations in default handling, cached `structuredClone`, and memoized registry key getters to shave allocations off hot paths like `Model.copy()` and `Registry.getModel()`.
 * Skipped redundant change events and reused registry keys; local Node 22 microbenchmarks show `getModel` (~100k ops) in ~0.70s, `toggle` (~100k ops) in ~0.03s, and `resetData` (~10k ops) in ~0.007s.
 
 ### 0.5.0
