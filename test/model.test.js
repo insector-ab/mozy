@@ -1,13 +1,13 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
 import { v4 as uuidV4, validate as uuidValidate, version as uuidVersion } from 'uuid';
-import chai from 'chai';
+import * as chai from 'chai';
 
-import { Model } from '../src/index';
+import { Model } from '../src/index.js';
 import {
   Dimensions,
   Rect
-} from './layout';
+} from './layout.js';
 
 chai.should();
 const { expect } = chai;

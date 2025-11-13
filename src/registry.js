@@ -1,6 +1,5 @@
-import ExtendableError from 'es6-error';
-import Model from './model';
-import Factory from './factory';
+import Model from './model.js';
+import Factory from './factory.js';
 
 /**
  * @typedef {Record<string, any>} ModelData
@@ -333,7 +332,7 @@ Registry.get = function(name, factory, options) {
 /**
  * InvalidRegistryKeyError
  */
-export class InvalidRegistryKeyError extends ExtendableError {
+export class InvalidRegistryKeyError extends Error {
 
   /**
    * @param {string|undefined} key
@@ -345,6 +344,10 @@ export class InvalidRegistryKeyError extends ExtendableError {
       lines.push('Data: ' + JSON.stringify(data));
     }
     super(lines.join(' '));
+    this.name = 'InvalidRegistryKeyError';
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, InvalidRegistryKeyError);
+    }
   }
 
 }

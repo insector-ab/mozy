@@ -3,9 +3,9 @@
  * @typedef {import('./factory').default} FactoryClass
  * @typedef {import('./registry').default} RegistryClass
  */
-import Model, { identities } from './model';
-import Factory from './factory';
-import Registry from './registry';
+import Model, { identities } from './model.js';
+import Factory from './factory.js';
+import Registry from './registry.js';
 /**
  * Mozy classes
  */

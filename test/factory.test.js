@@ -1,18 +1,18 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
-import chai from 'chai';
+import * as chai from 'chai';
 
 import {
   Model,
   Factory,
   modelIdentities
-} from '../src/index';
+} from '../src/index.js';
 
 import {
   Rect,
   EdgeSizes,
   Dimensions
-} from './layout';
+} from './layout.js';
 
 const should = chai.should();
 

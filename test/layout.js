@@ -1,4 +1,4 @@
-import mozy from '../src/index';
+import mozy from '../src/index.js';
 
 /**
  * Rect

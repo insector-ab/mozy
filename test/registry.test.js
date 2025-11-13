@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
-import chai from 'chai';
+import * as chai from 'chai';
 
 import {
   Factory,
@@ -8,11 +8,11 @@ import {
   Registry,
   modelIdentities,
   modelRegistry
-} from '../src/index';
+} from '../src/index.js';
 import {
   ALLOW_OVERRIDES,
   InvalidRegistryKeyError
-} from '../src/registry';
+} from '../src/registry.js';
 
 chai.should();
 const { expect } = chai;

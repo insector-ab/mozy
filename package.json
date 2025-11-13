@@ -1,14 +1,13 @@
 {
   "name": "mozy",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "A model library using lazy initialization, factories and instance registries.",
-  "type": "commonjs",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "type": "module",
+  "main": "./dist/esm/index.js",
   "sideEffects": false,
   "exports": {
     ".": {
-      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js"
     },
     "./package.json": "./package.json"
@@ -20,7 +19,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "es6-error": "^4.1.1",
     "eventemitter3": "^5.0.1",
     "uuid": "^13.0.0"
   },
@@ -47,16 +45,14 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir dist/cjs --copy-files --source-maps inline",
     "build:esm": "cross-env BABEL_ENV=esm babel src --out-dir dist/esm --copy-files --source-maps inline",
     "build:types": "tsc --project tsconfig.types.json",
-    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
-    "watch": "cross-env BABEL_ENV=cjs babel src --watch --out-dir dist/cjs --copy-files",
+    "build": "npm run clean && npm run build:esm && npm run build:types",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
     "release": "npm run lint && npm test && npm run build",
     "test": "npm run test:coverage",
-    "test:unit": "cross-env BABEL_ENV=cjs mocha -r @babel/register ./test/**/*.test.js",
+    "test:unit": "cross-env BABEL_ENV=esm mocha -r @babel/register ./test/**/*.test.js",
     "test:coverage": "c8 --reporter=text --reporter=lcov npm run test:unit",
     "lint": "eslint src/**.js test/**.js"
   },
