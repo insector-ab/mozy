@@ -1,6 +1,6 @@
 {
   "name": "mozy",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A model library using lazy initialization, factories and instance registries.",
   "type": "module",
   "main": "./dist/esm/index.js",

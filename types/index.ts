@@ -11,10 +11,15 @@ export interface AssignOptions {
   setSilent?: boolean;
 }
 
+export type Flags = SetOptions;
+
 export declare class Model extends EventEmitter {
   constructor(data?: ModelData, ...args: any[]);
 
   static identity: string;
+  [key: string]: any;
+  protected _data: ModelData;
+  protected _previousData: ModelData;
 
   get uuid(): string | undefined;
   getModelIdentity(): string | undefined;
@@ -36,6 +41,11 @@ export declare class Model extends EventEmitter {
   addEventListener(event: string, listener: (...args: any[]) => void): this;
   removeEventListener(event: string, listener: (...args: any[]) => void): this;
   dispose(): this;
+  protected _parseData(data: ModelData): ModelData;
+  protected _getDefaults(...constructorArgs: any[]): ModelData;
+  protected _withDefaultData(data: ModelData, ...constructorArgs: any[]): ModelData;
+  protected _shouldSetDefaultValue(property: string, value: any): boolean;
+  protected _deleteReferences(): void;
 }
 
 export type ModelConstructor<T extends Model = Model> = new (...args: any[]) => T;
@@ -93,7 +103,7 @@ export declare const ALLOW_OVERRIDES: boolean;
 export declare const DONT_ALLOW_OVERRIDES: boolean;
 export declare class InvalidRegistryKeyError extends Error {}
 
-export declare const identities: Map<string, typeof Model>;
+export declare const modelIdentities: Map<string, typeof Model>;
 export declare const modelFactory: Factory;
 export declare const modelRegistry: Registry;
 
@@ -101,7 +111,7 @@ declare const mozy: {
   Model: typeof Model;
   Factory: typeof Factory;
   Registry: typeof Registry;
-  modelIdentities: typeof identities;
+  modelIdentities: typeof modelIdentities;
   modelFactory: typeof modelFactory;
   modelRegistry: typeof modelRegistry;
 };
