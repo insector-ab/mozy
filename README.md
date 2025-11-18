@@ -1,4 +1,4 @@
-# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-65%25-yellow.svg)
+# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-96%25-brightgreen.svg)
 A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_initialization), factories and instance registries.
 
 
@@ -237,6 +237,16 @@ First-party typings live under `dist/types/index.d.ts` and are generated from th
 
 ### Unreleased
 **Empty**
+
+### 0.6.3 – 2025-11-18
+* Forced all direct and transitive consumers onto `glob@^11.1.0` through npm overrides and pinned `test-exclude` to the last compatible `glob@7` branch so coverage tasks keep running on Node 22.
+* Regenerated the lockfile after running `npm audit fix` to ensure the patched dependency graph still passes `npm run build` and `npm test`.
+
+### 0.6.2 – 2025-11-15
+* Patched the `js-yaml` advisory by adding an explicit `^4.1.1` dependency and trimming the duplicate vulnerable copies that npm hoisted into the lockfile.
+
+### 0.6.1 – 2025-11-14
+* Expanded the published TypeScript declarations: `Model` now exposes its protected helpers, backing data references, and flags, and the exported identity map is renamed to `modelIdentities` for consistency.
 
 ### 0.6.0 – 2025-11-13
 * Replaced `wolfy87-eventemitter`, `lodash.clonedeep`, and `lodash.isplainobject` with maintained or native alternatives to shrink the runtime surface.
