@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "eventemitter3": "^5.0.4",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.6",
