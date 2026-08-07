@@ -1,17 +1,15 @@
 /* eslint no-unused-expressions: "off" */
 import * as chai from 'chai';
 
-import {
+import mozy, {
   Factory,
   Model,
   Registry,
   modelIdentities,
-  modelRegistry
-} from '../src/index.js';
-import {
+  modelRegistry,
   ALLOW_OVERRIDES,
   InvalidRegistryKeyError
-} from '../src/registry.js';
+} from '../src/index.js';
 
 chai.should();
 const { expect } = chai;
@@ -212,6 +210,17 @@ describe('Registry', () => {
         registry.dispose();
         registry.dispose();
         expect(registry._map).to.be.undefined;
+      });
+
+    });
+
+    describe('package entrypoint', () => {
+
+      it('should expose registry constants and errors on named and default exports', function() {
+        ALLOW_OVERRIDES.should.equal(true);
+        mozy.ALLOW_OVERRIDES.should.equal(ALLOW_OVERRIDES);
+        mozy.DONT_ALLOW_OVERRIDES.should.equal(false);
+        mozy.InvalidRegistryKeyError.should.equal(InvalidRegistryKeyError);
       });
 
     });

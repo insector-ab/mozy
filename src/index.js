@@ -5,13 +5,23 @@
  */
 import Model, { identities } from './model.js';
 import Factory from './factory.js';
-import Registry from './registry.js';
+import Registry, {
+  ALLOW_OVERRIDES,
+  DONT_ALLOW_OVERRIDES,
+  InvalidRegistryKeyError
+} from './registry.js';
 /**
  * Mozy classes
  */
 export { Model };
 export { Factory };
 export { Registry };
+/**
+ * Registry constants and errors
+ */
+export { ALLOW_OVERRIDES };
+export { DONT_ALLOW_OVERRIDES };
+export { InvalidRegistryKeyError };
 /**
  * Model identities
  * @type {Map<string, ModelConstructor>}
@@ -35,6 +45,9 @@ export const modelRegistry = new Registry(modelFactory);
  *  Model: typeof Model,
  *  Factory: typeof Factory,
  *  Registry: typeof Registry,
+ *  ALLOW_OVERRIDES: typeof ALLOW_OVERRIDES,
+ *  DONT_ALLOW_OVERRIDES: typeof DONT_ALLOW_OVERRIDES,
+ *  InvalidRegistryKeyError: typeof InvalidRegistryKeyError,
  *  modelIdentities: typeof modelIdentities,
  *  modelFactory: typeof modelFactory,
  *  modelRegistry: typeof modelRegistry
@@ -44,6 +57,9 @@ export default {
   Model,
   Factory,
   Registry,
+  ALLOW_OVERRIDES,
+  DONT_ALLOW_OVERRIDES,
+  InvalidRegistryKeyError,
   modelIdentities,
   modelFactory,
   modelRegistry

@@ -1,6 +1,6 @@
 {
   "name": "mozy",
-  "version": "0.6.3",
+  "version": "1.0.0",
   "description": "A model library using lazy initialization, factories and instance registries.",
   "type": "module",
   "engines": {

@@ -84,8 +84,8 @@ export declare class Registry {
   getValidKeyIn(data: ModelData): string;
   getModel<T extends Model>(data: ModelData, Constructor?: ModelConstructor<T>): T;
   newInstanceFor<T extends Model>(data: ModelData): T;
-  register(model: Model): this;
-  unregister(model: Model): boolean;
+  register(model: Model, key?: string): this;
+  unregister(model: Model, key?: string): boolean;
   validate(key: any, value: Model): this;
   isValidKey(key: any): boolean;
   dataHasValidKey(data: ModelData): boolean;
@@ -111,6 +111,9 @@ declare const mozy: {
   Model: typeof Model;
   Factory: typeof Factory;
   Registry: typeof Registry;
+  ALLOW_OVERRIDES: typeof ALLOW_OVERRIDES;
+  DONT_ALLOW_OVERRIDES: typeof DONT_ALLOW_OVERRIDES;
+  InvalidRegistryKeyError: typeof InvalidRegistryKeyError;
   modelIdentities: typeof modelIdentities;
   modelFactory: typeof modelFactory;
   modelRegistry: typeof modelRegistry;

@@ -8,6 +8,8 @@ A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_i
 npm install mozy
 ```
 
+Requires Node.js 20 or later.
+
 
 ## Defining models
 
@@ -234,6 +236,16 @@ First-party typings live under `dist/types/index.d.ts` and are generated from th
 
 ### Unreleased
 **Empty**
+
+### 1.0.0 – 2026-08-07
+* First stable release. The public API has been unchanged for years and now carries full semver guarantees.
+* Now requires Node.js 20 or later (declared in `engines`); upgraded `uuid` to v14.
+* Rewrote `Model.copy()` without the regex-over-JSON approach: values under `uuid` keys get fresh uuids, and string values and object keys that exactly equal a replaced uuid are remapped consistently — but strings that merely contain a uuid are no longer corrupted. Objects with `toJSON` (nested models, dates) are serialized like `JSON.stringify` does, and own `__proto__` keys are copied as plain data.
+* `Registry.dispose()` is now idempotent (a second call no longer throws) and removes the instance from the multiton store, so `Registry.get(name)` after dispose returns a fresh registry.
+* `Factory.getConstructor()` only resolves own properties on plain object constructor maps, so identities from untrusted data can't resolve inherited keys like `"constructor"`.
+* `ALLOW_OVERRIDES`, `DONT_ALLOW_OVERRIDES` and `InvalidRegistryKeyError` are now exported from the package entrypoint (named and on the default export), matching the published typings and the README examples.
+* Moved `Model.identity` and `Registry.get`/`Registry._instances` into class bodies as static members.
+* Security updates across dev dependencies (babel toolchain, js-yaml, brace-expansion, picomatch, flatted, serialize-javascript, jsdiff); `npm audit` is clean.
 
 ### 0.6.3 – 2025-11-18
 * Forced all direct and transitive consumers onto `glob@^11.1.0` through npm overrides and pinned `test-exclude` to the last compatible `glob@7` branch so coverage tasks keep running on Node 22.
