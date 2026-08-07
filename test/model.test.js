@@ -173,6 +173,36 @@ describe('Model', () => {
         copied.get('note').should.equal(`see ${rect.uuid}`);
       });
 
+      it('should remap object keys that exactly equal a replaced uuid', function() {
+        const rect = new Rect();
+        const source = new Model({ box: rect.getDataReference(), lookup: { [rect.uuid]: 'meta' } });
+        const copied = source.copy();
+        const newUuid = copied.get('box').uuid;
+        copied.get('lookup').should.have.property(newUuid, 'meta');
+        copied.get('lookup').should.not.have.property(rect.uuid);
+      });
+
+      it('should honor toJSON on nested objects, like JSON.stringify', function() {
+        const rect = new Rect();
+        const date = new Date(0);
+        const source = new Model({ box: rect, created: date });
+        const copied = source.copy();
+        copied.get('box').should.not.be.instanceOf(Model);
+        copied.get('box').should.have.property('identity', Rect.identity);
+        isUuidV4(copied.get('box').uuid).should.equal(true);
+        copied.get('box').uuid.should.not.equal(rect.uuid);
+        copied.get('created').should.equal(date.toJSON());
+      });
+
+      it('should copy an own "__proto__" key as data without touching the prototype', function() {
+        const source = new Model(JSON.parse('{"nested": {"__proto__": {"x": 1}, "y": 2}}'));
+        const copied = source.copy();
+        const nested = copied.get('nested');
+        Object.getPrototypeOf(nested).should.equal(Object.prototype);
+        Object.getOwnPropertyDescriptor(nested, '__proto__').value.should.deep.equal({ x: 1 });
+        nested.y.should.equal(2);
+      });
+
       it('should copy a complex model graph with arrays and cross-branch references', function() {
         const shared = new Rect();
         const deep = new Dimensions();

@@ -196,8 +196,9 @@ export default class Model extends EventEmitter {
   }
   /**
    * Return a copy of this model, with new uuids. Values under "uuid"
-   * keys get new uuids, and any string value that exactly equals a
-   * replaced uuid (a reference) is remapped to the same new uuid.
+   * keys get new uuids, and any string value or object key that
+   * exactly equals a replaced uuid (a reference) is remapped to the
+   * same new uuid.
    * @return {Model} New instance of Model (or Model subclass).
    */
   copy() {
@@ -365,6 +366,11 @@ function collectUuids(value, uuidMap) {
     return;
   }
   if (value && typeof value === 'object') {
+    // Honor JSON serialization, like JSON.stringify does.
+    if (typeof value.toJSON === 'function') {
+      collectUuids(value.toJSON(), uuidMap);
+      return;
+    }
     const obj = /** @type {Record<string, any>} */ (value);
     for (const key in obj) {
       if (!Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -382,7 +388,9 @@ function collectUuids(value, uuidMap) {
 }
 
 /**
- * Deep clone value, replacing string values found in uuidMap.
+ * Deep clone value, replacing string values and object keys found
+ * in uuidMap. Objects with a toJSON method are serialized first,
+ * like JSON.stringify does.
  * @param {*} value
  * @param {Map<string, string>} uuidMap
  * @return {*}
@@ -395,11 +403,21 @@ function remapUuids(value, uuidMap) {
     return Array.from(value, item => remapUuids(item, uuidMap));
   }
   if (value && typeof value === 'object') {
+    if (typeof value.toJSON === 'function') {
+      return remapUuids(value.toJSON(), uuidMap);
+    }
     const obj = /** @type {Record<string, any>} */ (value);
     const clone = /** @type {Record<string, any>} */ ({});
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        clone[key] = remapUuids(obj[key], uuidMap);
+        // Define instead of assign, so an own "__proto__" key is
+        // copied as data and can't hit the prototype setter.
+        Object.defineProperty(clone, uuidMap.get(key) || key, {
+          value: remapUuids(obj[key], uuidMap),
+          enumerable: true,
+          writable: true,
+          configurable: true
+        });
       }
     }
     return clone;
