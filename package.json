@@ -23,11 +23,11 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.6",
-    "@babel/core": "^7.29.0",
-    "@babel/node": "^7.29.0",
-    "@babel/preset-env": "^7.29.0",
-    "@babel/register": "^7.28.6",
+    "@babel/cli": "^8.0.4",
+    "@babel/core": "^8.0.1",
+    "@babel/node": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "@babel/register": "^8.0.1",
     "@eslint/js": "^9.39.1",
     "c8": "^9.1.0",
     "chai": "^6.2.2",
