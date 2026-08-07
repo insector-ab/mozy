@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
 import { v4 as uuidV4, validate as uuidValidate, version as uuidVersion } from 'uuid';
 import * as chai from 'chai';
@@ -157,6 +156,80 @@ describe('Model', () => {
 
       it('should preserve uuid references (key !== "uuid")', function() {
         model.get('someUuidReference').should.equal(copiedModel.get('someUuidReference'));
+      });
+
+      it('should remap values that exactly equal a replaced uuid', function() {
+        const rect = new Rect();
+        const source = new Model({ box: rect.getDataReference(), boxRef: rect.uuid });
+        const copied = source.copy();
+        copied.get('boxRef').should.equal(copied.get('box').uuid);
+        copied.get('boxRef').should.not.equal(rect.uuid);
+      });
+
+      it('should not touch strings that merely contain a replaced uuid', function() {
+        const rect = new Rect();
+        const source = new Model({ box: rect.getDataReference(), note: `see ${rect.uuid}` });
+        const copied = source.copy();
+        copied.get('note').should.equal(`see ${rect.uuid}`);
+      });
+
+      it('should remap object keys that exactly equal a replaced uuid', function() {
+        const rect = new Rect();
+        const source = new Model({ box: rect.getDataReference(), lookup: { [rect.uuid]: 'meta' } });
+        const copied = source.copy();
+        const newUuid = copied.get('box').uuid;
+        copied.get('lookup').should.have.property(newUuid, 'meta');
+        copied.get('lookup').should.not.have.property(rect.uuid);
+      });
+
+      it('should honor toJSON on nested objects, like JSON.stringify', function() {
+        const rect = new Rect();
+        const date = new Date(0);
+        const source = new Model({ box: rect, created: date });
+        const copied = source.copy();
+        copied.get('box').should.not.be.instanceOf(Model);
+        copied.get('box').should.have.property('identity', Rect.identity);
+        isUuidV4(copied.get('box').uuid).should.equal(true);
+        copied.get('box').uuid.should.not.equal(rect.uuid);
+        copied.get('created').should.equal(date.toJSON());
+      });
+
+      it('should copy an own "__proto__" key as data without touching the prototype', function() {
+        const source = new Model(JSON.parse('{"nested": {"__proto__": {"x": 1}, "y": 2}}'));
+        const copied = source.copy();
+        const nested = copied.get('nested');
+        Object.getPrototypeOf(nested).should.equal(Object.prototype);
+        Object.getOwnPropertyDescriptor(nested, '__proto__').value.should.deep.equal({ x: 1 });
+        nested.y.should.equal(2);
+      });
+
+      it('should copy a complex model graph with arrays and cross-branch references', function() {
+        const shared = new Rect();
+        const deep = new Dimensions();
+        const source = new Model({
+          children: [
+            { identity: 'test.Node', uuid: uuidV4(), nested: { deep: deep.getDataReference(), siblingRef: shared.uuid } },
+            shared.getDataReference()
+          ],
+          lookup: { shared: shared.uuid, refs: [shared.uuid, deep.uuid], tags: ['a', 'b'], count: 3, nothing: null }
+        });
+        const copied = source.copy();
+        const data = copied.getDataReference();
+        // All uuid keys replaced
+        data.children[0].uuid.should.not.equal(source.get('children')[0].uuid);
+        data.children[1].uuid.should.not.equal(shared.uuid);
+        data.children[0].nested.deep.uuid.should.not.equal(deep.uuid);
+        isUuidV4(data.children[1].uuid).should.equal(true);
+        // References remapped consistently across branches
+        data.children[0].nested.siblingRef.should.equal(data.children[1].uuid);
+        data.lookup.shared.should.equal(data.children[1].uuid);
+        data.lookup.refs.should.deep.equal([data.children[1].uuid, data.children[0].nested.deep.uuid]);
+        // Non-uuid values intact
+        data.lookup.tags.should.deep.equal(['a', 'b']);
+        data.lookup.count.should.equal(3);
+        expect(data.lookup.nothing).to.equal(null);
+        // Original untouched
+        source.get('children')[1].uuid.should.equal(shared.uuid);
       });
 
     });

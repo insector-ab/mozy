@@ -1,9 +1,8 @@
 import EventEmitter from 'eventemitter3';
 import { v4 as uuidV4 } from 'uuid';
 
-const UUID_ATTR_REGEXP = /"uuid":".*?"/g;
 // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
-const UUID_V4_REGEXP = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}/i;
+const UUID_V4_REGEXP = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 
 /**
  * @typedef {Record<string, any>} ModelData
@@ -15,6 +14,8 @@ const UUID_V4_REGEXP = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[
  * Model
  */
 export default class Model extends EventEmitter {
+  // Polymorphic identity
+  static identity = 'mozy.Model';
   /**
    * Model.constructor
    * @param {ModelData} [data] JSON serializable object.
@@ -194,29 +195,21 @@ export default class Model extends EventEmitter {
     return this;
   }
   /**
-   * Return a copy of this model, with new uuids.
-   * FIX: Better way to do this?
+   * Return a copy of this model, with new uuids. Values under "uuid"
+   * keys get new uuids, and any string value or object key that
+   * exactly equals a replaced uuid (a reference) is remapped to the
+   * same new uuid.
    * @return {Model} New instance of Model (or Model subclass).
    */
   copy() {
-    // stringify data dict
-    let jsonStr = JSON.stringify(this.getDataReference());
-    // Create Uuid map
-    const uuidMap = (jsonStr.match(UUID_ATTR_REGEXP) || []).reduce((acc, matchStr) => {
-      const match = matchStr.match(UUID_V4_REGEXP);
-      if (match) {
-        const current = match[0];
-        if (!acc[current]) {
-          acc[current] = uuidV4();
-        }
-      }
-      return acc;
-    }, /** @type {Record<string, string>} */ ({}));
-    // Replace current uuids with new one's
-    jsonStr = Object.keys(uuidMap).reduce((acc, oldUuid) => acc.split(oldUuid).join(uuidMap[oldUuid]), jsonStr);
+    const data = this.getDataReference();
+    // Map current uuids to new one's
+    /** @type {Map<string, string>} */
+    const uuidMap = new Map();
+    collectUuids(data, uuidMap);
     // return instance of this
     const Constructor = /** @type {new (data: ModelData) => Model} */ (this.constructor);
-    return new Constructor(JSON.parse(jsonStr));
+    return new Constructor(remapUuids(data, uuidMap));
   }
   /**
    * Interface for dispatching events.
@@ -339,8 +332,6 @@ export default class Model extends EventEmitter {
   }
 
 }
-// Polymorphic identity
-Model.identity = 'mozy.Model';
 
 /**
  * Model identities
@@ -362,6 +353,76 @@ function cloneData(value) {
     return structuredCloneFn(value);
   }
   return cloneFallback(value);
+}
+
+/**
+ * Collect uuids stored under "uuid" keys, mapping each to a new uuid.
+ * @param {*} value
+ * @param {Map<string, string>} uuidMap
+ */
+function collectUuids(value, uuidMap) {
+  if (Array.isArray(value)) {
+    value.forEach(item => collectUuids(item, uuidMap));
+    return;
+  }
+  if (value && typeof value === 'object') {
+    // Honor JSON serialization, like JSON.stringify does.
+    if (typeof value.toJSON === 'function') {
+      collectUuids(value.toJSON(), uuidMap);
+      return;
+    }
+    const obj = /** @type {Record<string, any>} */ (value);
+    for (const key in obj) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+        continue;
+      }
+      if (key === 'uuid' && typeof obj[key] === 'string' && UUID_V4_REGEXP.test(obj[key])) {
+        if (!uuidMap.has(obj[key])) {
+          uuidMap.set(obj[key], uuidV4());
+        }
+      } else {
+        collectUuids(obj[key], uuidMap);
+      }
+    }
+  }
+}
+
+/**
+ * Deep clone value, replacing string values and object keys found
+ * in uuidMap. Objects with a toJSON method are serialized first,
+ * like JSON.stringify does.
+ * @param {*} value
+ * @param {Map<string, string>} uuidMap
+ * @return {*}
+ */
+function remapUuids(value, uuidMap) {
+  if (typeof value === 'string') {
+    return uuidMap.get(value) || value;
+  }
+  if (Array.isArray(value)) {
+    return Array.from(value, item => remapUuids(item, uuidMap));
+  }
+  if (value && typeof value === 'object') {
+    if (typeof value.toJSON === 'function') {
+      return remapUuids(value.toJSON(), uuidMap);
+    }
+    const obj = /** @type {Record<string, any>} */ (value);
+    const clone = /** @type {Record<string, any>} */ ({});
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        // Define instead of assign, so an own "__proto__" key is
+        // copied as data and can't hit the prototype setter.
+        Object.defineProperty(clone, uuidMap.get(key) || key, {
+          value: remapUuids(obj[key], uuidMap),
+          enumerable: true,
+          writable: true,
+          configurable: true
+        });
+      }
+    }
+    return clone;
+  }
+  return value;
 }
 
 /**
