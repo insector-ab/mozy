@@ -3,6 +3,9 @@
   "version": "0.6.3",
   "description": "A model library using lazy initialization, factories and instance registries.",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "main": "./dist/esm/index.js",
   "sideEffects": false,
   "exports": {

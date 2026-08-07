@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
 import * as chai from 'chai';
 
@@ -208,6 +207,13 @@ describe('Registry', () => {
         expect(registry._factory).to.be.undefined;
       });
 
+      it('should be safe to call twice', function() {
+        const registry = createRegistry();
+        registry.dispose();
+        registry.dispose();
+        expect(registry._map).to.be.undefined;
+      });
+
     });
 
     describe('Registry.get(name, ...args)', () => {
@@ -219,6 +225,18 @@ describe('Registry', () => {
         const second = Registry.get(name, factory);
         first.should.equal(second);
         Registry._instances.delete(name);
+      });
+
+      it('should drop disposed instances from the multiton store', function() {
+        const name = `test-registry-disposed-${Date.now()}`;
+        const factory = new Factory(modelIdentities);
+        const first = Registry.get(name, factory);
+        first.dispose();
+        Registry._instances.has(name).should.equal(false);
+        const second = Registry.get(name, factory);
+        second.should.not.equal(first);
+        second.register(new Model());
+        second.dispose();
       });
 
     });

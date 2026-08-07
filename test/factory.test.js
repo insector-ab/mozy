@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
 import * as chai from 'chai';
 
@@ -195,6 +194,13 @@ describe('Factory', () => {
         should.equal(factory.getConstructor(), undefined);
         should.equal(factory.getConstructor('an.unknown.identity'), undefined);
         should.equal(factory.getConstructor({}), undefined);
+      });
+
+      it('should not resolve inherited object keys as identities', function() {
+        const objectFactory = new Factory({ [Rect.identity]: Rect });
+        should.equal(objectFactory.getConstructor('constructor'), undefined);
+        should.equal(objectFactory.getConstructor('hasOwnProperty'), undefined);
+        objectFactory.isKnownIdentity('constructor').should.be.false;
       });
 
     });

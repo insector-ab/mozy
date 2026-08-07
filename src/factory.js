@@ -90,7 +90,11 @@ export default class Factory {
         return value;
       }
     }
-    return this._constructorMap[identity];
+    // Own properties only, so identities from untrusted data
+    // can't resolve inherited keys like "constructor".
+    return Object.prototype.hasOwnProperty.call(this._constructorMap, identity)
+      ? this._constructorMap[identity]
+      : /** @type {ModelConstructor} */ (/** @type {unknown} */ (undefined));
   }
   /**
    * Get Constructor registered for identity. Throw error if not found.

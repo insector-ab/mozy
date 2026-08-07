@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /* eslint no-unused-expressions: "off" */
 import { v4 as uuidV4, validate as uuidValidate, version as uuidVersion } from 'uuid';
 import * as chai from 'chai';
@@ -157,6 +156,50 @@ describe('Model', () => {
 
       it('should preserve uuid references (key !== "uuid")', function() {
         model.get('someUuidReference').should.equal(copiedModel.get('someUuidReference'));
+      });
+
+      it('should remap values that exactly equal a replaced uuid', function() {
+        const rect = new Rect();
+        const source = new Model({ box: rect.getDataReference(), boxRef: rect.uuid });
+        const copied = source.copy();
+        copied.get('boxRef').should.equal(copied.get('box').uuid);
+        copied.get('boxRef').should.not.equal(rect.uuid);
+      });
+
+      it('should not touch strings that merely contain a replaced uuid', function() {
+        const rect = new Rect();
+        const source = new Model({ box: rect.getDataReference(), note: `see ${rect.uuid}` });
+        const copied = source.copy();
+        copied.get('note').should.equal(`see ${rect.uuid}`);
+      });
+
+      it('should copy a complex model graph with arrays and cross-branch references', function() {
+        const shared = new Rect();
+        const deep = new Dimensions();
+        const source = new Model({
+          children: [
+            { identity: 'test.Node', uuid: uuidV4(), nested: { deep: deep.getDataReference(), siblingRef: shared.uuid } },
+            shared.getDataReference()
+          ],
+          lookup: { shared: shared.uuid, refs: [shared.uuid, deep.uuid], tags: ['a', 'b'], count: 3, nothing: null }
+        });
+        const copied = source.copy();
+        const data = copied.getDataReference();
+        // All uuid keys replaced
+        data.children[0].uuid.should.not.equal(source.get('children')[0].uuid);
+        data.children[1].uuid.should.not.equal(shared.uuid);
+        data.children[0].nested.deep.uuid.should.not.equal(deep.uuid);
+        isUuidV4(data.children[1].uuid).should.equal(true);
+        // References remapped consistently across branches
+        data.children[0].nested.siblingRef.should.equal(data.children[1].uuid);
+        data.lookup.shared.should.equal(data.children[1].uuid);
+        data.lookup.refs.should.deep.equal([data.children[1].uuid, data.children[0].nested.deep.uuid]);
+        // Non-uuid values intact
+        data.lookup.tags.should.deep.equal(['a', 'b']);
+        data.lookup.count.should.equal(3);
+        expect(data.lookup.nothing).to.equal(null);
+        // Original untouched
+        source.get('children')[1].uuid.should.equal(shared.uuid);
       });
 
     });

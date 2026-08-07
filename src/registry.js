@@ -35,6 +35,28 @@ const defaultOptions = /** @type {RegistryOptions} */ ({
  * Registry
  */
 export default class Registry {
+  // Store multitons
+  /** @type {Map<string, Registry>} */
+  static _instances = new Map();
+  /**
+   * Multiton getter.
+   * @param {string} name Registry name.
+   * @param {RegistryFactory} factory
+   * @param {RegistryOptions} [options]
+   * @return {Registry}
+   */
+  static get(name, factory, options) {
+    // Instance exists?
+    if (Registry._instances.has(name)) {
+      return /** @type {Registry} */ (Registry._instances.get(name));
+    }
+    // Create new Registry
+    const reg = new Registry(factory, options);
+    // Register
+    Registry._instances.set(name, reg);
+    // return
+    return reg;
+  }
   /**
    * Registry.constructor
    * @param {RegistryFactory} factory Model factory.
@@ -270,13 +292,20 @@ export default class Registry {
     this._map.clear();
   }
   /**
-   * Dispose registry. Clear map and delete references.
+   * Dispose registry. Clear map, remove from multiton store
+   * and delete references.
    */
   dispose() {
     // Already disposed?
-    if (!Object.prototype.hasOwnProperty.call(this, '_map')) {
+    if (!this._map) {
       return;
     }
+    // Remove from multiton store
+    Registry._instances.forEach((registry, name) => {
+      if (registry === this) {
+        Registry._instances.delete(name);
+      }
+    });
     // Clear registry
     this.clear();
     // delete refs
@@ -304,30 +333,6 @@ export default class Registry {
   }
 
 }
-
-// Store multitons
-/** @type {Map<string, Registry>} */
-Registry._instances = new Map();
-
-// Multiton getter
-/**
- * @param {string} name Registry name.
- * @param {RegistryFactory} factory
- * @param {RegistryOptions} [options]
- * @return {Registry}
- */
-Registry.get = function(name, factory, options) {
-  // Instance exists?
-  if (Registry._instances.has(name)) {
-    return /** @type {Registry} */ (Registry._instances.get(name));
-  }
-  // Create new Registry
-  const reg = new Registry(factory, options);
-  // Register
-  Registry._instances.set(name, reg);
-  // return
-  return reg;
-};
 
 /**
  * InvalidRegistryKeyError
