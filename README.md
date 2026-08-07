@@ -1,4 +1,4 @@
-# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-96%25-brightgreen.svg)
+# mozy &middot; [![GitHub license](https://img.shields.io/github/license/insector-ab/mozy.svg)](https://github.com/insector-ab/mozy/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/mozy.svg?style=flat)](https://www.npmjs.com/package/mozy) ![Coverage Status](https://img.shields.io/badge/Coverage%20(lines)-96%25-brightgreen.svg)
 A model library using [lazy initialization](https://en.wikipedia.org/wiki/Lazy_initialization), factories and instance registries.
 
 
@@ -217,16 +217,13 @@ The test script runs the Mocha suite through Babel and reports coverage via V8's
 
 ## Build
 
-Compiled artifacts now live in `dist/`:
+Compiled artifacts live in `dist/`:
 
-- `npm run build` cleans the folder and emits both CommonJS (`dist/cjs`) and ESM (`dist/esm`) bundles via Babel.
-- `npm run watch` rebuilds the CommonJS bundle on change for local development.
-- Type declarations are generated via `npm run build:types` (also part of `npm run build`) and published under `dist/types`.
-- Source maps are emitted inline for both bundles to simplify downstream debugging.
+- `npm run build` cleans the folder, emits the ESM bundle to `dist/esm` via Babel, and runs `npm run build:types` as part of the same command.
+- Type declarations are generated via `npm run build:types` and published under `dist/types`.
+- Source maps are emitted inline for the bundle to simplify downstream debugging.
 
-The package `exports` map points Node's `import` consumers at `dist/esm/index.js` and `require` callers at `dist/cjs/index.js`, so publishing only requires `npm publish` (the `prepare` script runs the build automatically).
-
-For local releases, run `npm run release` to execute lint, tests (with coverage), and the full build in a single command before publishing.
+`package.json` is `type: module`, so the published `exports` map only exposes the ESM entrypoint at `dist/esm/index.js` (along with the bundled types).
 
 ## TypeScript
 
@@ -295,4 +292,4 @@ First-party typings live under `dist/types/index.d.ts` and are generated from th
 
 ## License
 
-This software is licensed under the [MIT License](https://github.com/insector-ab/mozy/blob/master/LICENSE).
+This software is licensed under the [MIT License](https://github.com/insector-ab/mozy/blob/main/LICENSE).
