@@ -29,8 +29,14 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Type-check source (JSDoc)
+        run: npm run check:src
+
       - name: Tests with coverage
         run: npm test
 
       - name: Build bundles
         run: npm run build
+
+      - name: Check published typings against entrypoint
+        run: npm run check:package

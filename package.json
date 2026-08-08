@@ -1,6 +1,6 @@
 {
   "name": "mozy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A model library using lazy initialization, factories and instance registries.",
   "type": "module",
   "engines": {
@@ -63,6 +63,8 @@
     "build": "npm run clean && npm run build:esm && npm run build:types",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
+    "check:src": "tsc --project tsconfig.check.json",
+    "check:package": "tsc --project tsconfig.conformance.json",
     "test": "npm run test:coverage",
     "test:unit": "cross-env BABEL_ENV=esm mocha -r @babel/register ./test/**/*.test.js",
     "test:coverage": "c8 --reporter=text --reporter=lcov npm run test:unit",

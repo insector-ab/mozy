@@ -350,8 +350,10 @@ export class InvalidRegistryKeyError extends Error {
     }
     super(lines.join(' '));
     this.name = 'InvalidRegistryKeyError';
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, InvalidRegistryKeyError);
+    // V8-specific and absent from the standard lib typings.
+    const ErrorCtor = /** @type {ErrorConstructor & { captureStackTrace?: (target: object, ctor?: Function) => void }} */ (Error);
+    if (ErrorCtor.captureStackTrace) {
+      ErrorCtor.captureStackTrace(this, InvalidRegistryKeyError);
     }
   }
 

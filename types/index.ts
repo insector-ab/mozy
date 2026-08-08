@@ -1,4 +1,4 @@
-import type EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 export type ModelData = Record<string, any>;
 

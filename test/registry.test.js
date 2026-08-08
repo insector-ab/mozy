@@ -10,6 +10,7 @@ import mozy, {
   ALLOW_OVERRIDES,
   InvalidRegistryKeyError
 } from '../src/index.js';
+import * as entrypoint from '../src/index.js';
 
 chai.should();
 const { expect } = chai;
@@ -221,6 +222,21 @@ describe('Registry', () => {
         mozy.ALLOW_OVERRIDES.should.equal(ALLOW_OVERRIDES);
         mozy.DONT_ALLOW_OVERRIDES.should.equal(false);
         mozy.InvalidRegistryKeyError.should.equal(InvalidRegistryKeyError);
+      });
+
+      it('should export exactly the documented surface', function() {
+        Object.keys(entrypoint).sort().should.deep.equal([
+          'ALLOW_OVERRIDES',
+          'DONT_ALLOW_OVERRIDES',
+          'Factory',
+          'InvalidRegistryKeyError',
+          'Model',
+          'Registry',
+          'default',
+          'modelFactory',
+          'modelIdentities',
+          'modelRegistry'
+        ]);
       });
 
     });

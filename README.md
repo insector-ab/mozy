@@ -231,11 +231,17 @@ Compiled artifacts live in `dist/`:
 
 First-party typings live under `dist/types/index.d.ts` and are generated from the hand-authored `types/` source via `npm run build:types`. Consumers can rely on the `types` field in `package.json` without installing community-maintained definitions.
 
+Two type checks guard against drift and run in CI: `npm run check:src` type-checks the JSDoc-annotated source, and `npm run check:package` (after `npm run build`) compiles a conformance file that imports the package through its published exports map and touches every public export, so the hand-authored declarations can't silently diverge from the entrypoint.
+
 
 ## Changelog
 
 ### Unreleased
 **Empty**
+
+### 1.0.1 – 2026-08-08
+* Fixed the published typings under `moduleResolution: node16`/`nodenext`: the `EventEmitter` base class was imported as a default import, which resolves to the module namespace for those consumers and made `Model` fail with `TS2507`. The declarations now use a named import, which works under all resolution modes.
+* Added type-drift guardrails to CI: `npm run check:src` type-checks the JSDoc-annotated source, and `npm run check:package` verifies the published typings against the actual entrypoint via a package self-reference conformance file. A runtime test also pins the exact export surface.
 
 ### 1.0.0 – 2026-08-07
 * First stable release. The public API has been unchanged for years and now carries full semver guarantees.
