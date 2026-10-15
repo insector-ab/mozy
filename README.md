@@ -240,6 +240,12 @@ Two type checks guard against drift and run in CI: `npm run check:src` type-chec
 ### Unreleased
 **Empty**
 
+### 1.1.0 – 2026-10-15
+* Upgraded the build toolchain to Babel 8. The published output targets the same browsers as before (the first versions with native ES module support), so `dist` stays free of class fields and other post-ES2017 syntax for consumers that bundle it without transpiling.
+* Building from source requires Node.js 22.18 or later; the published package runs on Node.js 20 or later, as before.
+* Removed the unused `@babel/register`, `@babel/node` and `cross-env` dev dependencies; the test suite runs the ES module source directly.
+* Security updates across dev dependencies (brace-expansion, js-yaml, browserslist, baseline-browser-mapping, @humanfs/node, braces via `@babel/cli`); `npm audit` is clean.
+
 ### 1.0.1 – 2026-08-08
 * Fixed the published typings under `moduleResolution: node16`/`nodenext`: the `EventEmitter` base class was imported as a default import, which resolves to the module namespace for those consumers and made `Model` fail with `TS2507`. The declarations now use a named import, which works under all resolution modes.
 * Added type-drift guardrails to CI: `npm run check:src` type-checks the JSDoc-annotated source, and `npm run check:package` verifies the published typings against the actual entrypoint via a package self-reference conformance file. A runtime test also pins the exact export surface.
