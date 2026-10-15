@@ -215,13 +215,14 @@ shared.register(rect);
 npm test
 ```
 
-The test script runs the Mocha suite through Babel and reports coverage via V8's built-in instrumentation (`c8`), emitting both text and lcov output. The suite targets >90% line coverage, including edge cases around the Registry and Factory helpers.
+The test script runs the Mocha suite directly against the ES module source and reports coverage via V8's built-in instrumentation (`c8`), emitting both text and lcov output. The suite targets >90% line coverage, including edge cases around the Registry and Factory helpers.
 
 ## Build
 
 Compiled artifacts live in `dist/`:
 
-- `npm run build` cleans the folder, emits the ESM bundle to `dist/esm` via Babel, and runs `npm run build:types` as part of the same command.
+- `npm run build` cleans the folder, emits the ESM bundle to `dist/esm` via Babel, and runs `npm run build:types` as part of the same command. Building requires Node.js 22.18 or later (Babel 8); the published package runs on Node.js 20 or later.
+- The bundle targets the first browser versions with native ES module support (Chrome 61, Safari 10.1, Firefox 60, Edge 16), so consumers can ship `dist` without transpiling it.
 - Type declarations are generated via `npm run build:types` and published under `dist/types`.
 - Source maps are emitted inline for the bundle to simplify downstream debugging.
 
